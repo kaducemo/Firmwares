@@ -1,0 +1,4 @@
+C:\GIT\Firmwares\NXP\EstudosTestes\MyUartProject\drivers/fsl_clock.h:889:20:CLOCK_SetSimSafeDivs	4	static
+../board/clock_config.c:69:13:CLOCK_CONFIG_FllStableDelay	16	static
+../board/clock_config.c:81:6:BOARD_InitBootClocks	8	static
+../board/clock_config.c:146:6:BOARD_BootClockRUN	8	static
