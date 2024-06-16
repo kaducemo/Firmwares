@@ -1,0 +1,1 @@
+Este repositório contem alguns firmwares utilizados, principalmente, em estudos e testes.
