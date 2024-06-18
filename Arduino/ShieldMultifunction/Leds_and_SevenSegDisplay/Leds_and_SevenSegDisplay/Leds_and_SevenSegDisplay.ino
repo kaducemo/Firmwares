@@ -1,5 +1,6 @@
 /*
- *    Teste SIM800L
+ *    Shield Multifunction test. 
+ *    I´ve used a multitask aproach through arduino-timer library
  *    AUTOR:   Carlos Eduardo Mayer de Oliveira
  *    DATA:    16/06/2024
 */
@@ -10,11 +11,8 @@ Timer<3, micros> timer; // 3 concurrent tasks, using micros as resolution
 
 unsigned int counter = 0; // Counter used to update 7 Seg display
 
-//Pins on the 74HC595 shift reg chip - correspondence with Arduino digital pins
-unsigned int ST_CP = 4;     // RCLK
-unsigned int SH_CP = 7;     // SCLK
-unsigned int DS    = 8;     // DIO
 
+//Pins on the 74HC595 shift reg chip - correspondence with Arduino digital pins
 #define LED_D1  13
 #define LED_D2  12
 #define LED_D3  11
@@ -97,12 +95,12 @@ void setDigit(unsigned int row, unsigned int digit, boolean decimalPoint)
         data &= 0xFE;
         
       // First 8 data bits all the way into the second 74HC595 
-      shiftOut(DS, SH_CP, LSBFIRST, data );
+      shiftOut(SER, SCKL, LSBFIRST, data );
 
       // Now shift 4 row bits into the first 74HC595 and latch
-      digitalWrite(ST_CP, LOW);
-      shiftOut(DS, SH_CP, LSBFIRST, rowSelector );
-      digitalWrite(ST_CP, HIGH);
+      digitalWrite(RCLK, LOW);
+      shiftOut(SER, SCKL, LSBFIRST, rowSelector );
+      digitalWrite(RCLK, HIGH);
       
 }
 
