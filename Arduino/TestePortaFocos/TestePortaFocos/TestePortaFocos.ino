@@ -34,15 +34,50 @@
 #define SCKL    7 //SH_CP
 #define SER     8 //DS
 
-#define CHANGE_PHASE_DELAY  100 //Contant delay to switch PHASES (GREEN/RED)
+// Chose your Base time
+#define MICROSECONDS
+//#define MILLISECONDS
 
-#define PULSING_PERIOD      500 //Duty cicle on pulsing red signal
+
+#ifdef MICROSECONDS
+  #define MULT_FACTOR   1000UL
+
+#endif
+
+#ifdef MILLISECONDS
+  #define MULT_FACTOR   1
+#endif
+
+// #define TICKS_TO_ONE_SECOND 1000 * MULT_FACTOR //TICKS to one second
+#define TICKS_TO_ONE_SECOND 1000000 //TICKS to one second
+
+#define TASK_GET_SWITCH_STATUS_MS   10
+#define TASK_EXECUTE_SWITCH_MS      50
+#define TASK_UPDATE_LEDS_MS         100
+#define TASK_UPDATE_COUNTER_MS      100
+#define TASK_UPDATE_DISPLAY_MS      1
+
+#define TASK_GET_SWITCH_STATUS_PERIOD   (TASK_GET_SWITCH_STATUS_MS * MULT_FACTOR)
+#define TASK_EXECUTE_SWITCH_PERIOD      (TASK_EXECUTE_SWITCH_MS * MULT_FACTOR)
+#define TASK_UPDATE_LEDS_PERIOD         (TASK_UPDATE_LEDS_MS * MULT_FACTOR)
+#define TASK_UPDATE_COUNTER_PERIOD      (TASK_UPDATE_COUNTER_MS * MULT_FACTOR)
+#define TASK_UPDATE_DISPLAY_PERIOD      (TASK_UPDATE_DISPLAY_MS * MULT_FACTOR)
+
+// #define TASK_GET_SWITCH_STATUS_PERIOD   10000
+// #define TASK_EXECUTE_SWITCH_PERIOD      50000
+// #define TASK_UPDATE_LEDS_PERIOD         100000
+// #define TASK_UPDATE_COUNTER_PERIOD      100000
+// #define TASK_UPDATE_DISPLAY_PERIOD      1000
+
+#define COUNTING_TIMES_UNTIL_ONE_SECOND   (TICKS_TO_ONE_SECOND/TASK_UPDATE_COUNTER_PERIOD) //Number of counting until we have 1s
+#define COUNTING_TIMES_UNTIL_HALF_SECOND  (COUNTING_TIMES_UNTIL_ONE_SECOND/2) //Duty cicle on pulsing red signal
 
 #define DEFAULT_RED_PHASE_PERIOD              10 //seconds
 #define DEFAULT_GREEN_PHASE_PERIOD            8
 #define DEFAULT_RED_PULSING_PHASE_PERIOD      4
 
-#define DEBOUNCE_PERIOD 20 // millisseconds
+
+#define DEBOUNCE_PERIOD_MS  20 // Debounce time in MILLISECONDS
 
 //MACROS
 #define LED_D1_OFF      digitalWrite(LED_D1, HIGH);
@@ -96,8 +131,16 @@ typedef enum
 
 //GLOBALS
 
-Timer<6, micros> timer;     // 6 concurrent tasks, using micros as resolution
+#ifdef MICROSECONDS
+Timer<5, micros> timer;     // 6 concurrent tasks, using micros as resolution
+#endif
+
+#ifdef MILLISECONDS
+Timer<5> timer;     // 6 concurrent tasks, using micros as resolution
+#endif
+
 unsigned int display        = 0; //Used to update 7 Seg display
+uint16_t preDiv = 0; //counting to one second counter
 opMOde_t opMOde             = OPMODE_OPERATING;
 phaseCycle_t phaseCycle     = CYCLE_RED;
 switch_t lastPressedSwitch  = SWITCH_NONE;
@@ -139,6 +182,7 @@ bool TaskExecuteSwitch(void *argument)
         opMOde = (opMOde+1) % (OPMODE_CONF_PULSE_TIME+1);
         phaseCycle = CYCLE_RED;
         display = 0;
+        preDiv = 0;
         if(opMOde == OPMODE_OPERATING)
         {
           RELAY_RED_ON;
@@ -209,7 +253,7 @@ bool TaskGetSwitchStatus(void *argument)
         else
         {
           lastDebounceTime[SWITCH_MODE-1] += millis();                   
-          pressedSwitch = (lastDebounceTime[SWITCH_MODE-1] > (initialDebounceTime[SWITCH_MODE-1] + DEBOUNCE_PERIOD)) ? SWITCH_MODE : pressedSwitch; 
+          pressedSwitch = (lastDebounceTime[SWITCH_MODE-1] > (initialDebounceTime[SWITCH_MODE-1] + DEBOUNCE_PERIOD_MS)) ? SWITCH_MODE : pressedSwitch; 
           if(pressedSwitch)   
           {
             // Serial.write("PS: ");
@@ -244,7 +288,7 @@ bool TaskGetSwitchStatus(void *argument)
         else
         {
           lastDebounceTime[SWITCH_UP-1] += millis();                   
-          pressedSwitch = (lastDebounceTime[SWITCH_UP-1] > (initialDebounceTime[SWITCH_UP-1] + DEBOUNCE_PERIOD)) ? SWITCH_UP : pressedSwitch; 
+          pressedSwitch = (lastDebounceTime[SWITCH_UP-1] > (initialDebounceTime[SWITCH_UP-1] + DEBOUNCE_PERIOD_MS)) ? SWITCH_UP : pressedSwitch; 
           if(pressedSwitch)   
           {
             // Serial.write("PS: ");
@@ -279,7 +323,7 @@ bool TaskGetSwitchStatus(void *argument)
         else
         {
           lastDebounceTime[SWITCH_DOWN-1] += millis();                   
-          pressedSwitch = (lastDebounceTime[SWITCH_DOWN-1] > (initialDebounceTime[SWITCH_DOWN-1] + DEBOUNCE_PERIOD)) ? SWITCH_DOWN : pressedSwitch; 
+          pressedSwitch = (lastDebounceTime[SWITCH_DOWN-1] > (initialDebounceTime[SWITCH_DOWN-1] + DEBOUNCE_PERIOD_MS)) ? SWITCH_DOWN : pressedSwitch; 
           if(pressedSwitch)   
           {
             // Serial.write("PS: ");
@@ -359,11 +403,13 @@ bool TaskUpdatesLeds(void *argument)
   return true; // to repeat the action - false to stop
 }
 
-//Task that updates the counter 1s period
+//Task that updates counter
 bool TaskUpdatesCounter(void *argument) 
-{  
+{ 
     if(opMOde == OPMODE_OPERATING)
     {
+      preDiv = (++preDiv) % COUNTING_TIMES_UNTIL_ONE_SECOND;
+      
       switch(phaseCycle)
       {
         case CYCLE_RED:
@@ -371,8 +417,12 @@ bool TaskUpdatesCounter(void *argument)
           RELAY_GREEN_OFF;
           RELAY_RETURN_ON;   
 
-          if(display < cyclePeriod[CYCLE_RED]-1)
-            display++;
+          if(display < cyclePeriod[CYCLE_RED])
+          {
+            if(!preDiv)
+              display++;
+          }
+            
           else
           {
             RELAY_RED_OFF;
@@ -380,7 +430,7 @@ bool TaskUpdatesCounter(void *argument)
             RELAY_RETURN_OFF;   
 
             display = 0;
-            phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED+1);
+            phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED + 1);
           }
           break;
 
@@ -390,8 +440,11 @@ bool TaskUpdatesCounter(void *argument)
           RELAY_GREEN_ON;
           RELAY_RETURN_ON;   
 
-          if(display < cyclePeriod[CYCLE_GREEN]-1)
+          if(display < cyclePeriod[CYCLE_GREEN])
+          {
+            if(!preDiv)
               display++;
+          }
           else
           {
             RELAY_RED_OFF;
@@ -407,12 +460,21 @@ bool TaskUpdatesCounter(void *argument)
 
         case CYCLE_PULSING_RED:
 
-          RELAY_GREEN_OFF;
-          RELAY_RED_TOGGLE;
-          RELAY_RETURN_TOGGLE;
+          preDiv = (preDiv % COUNTING_TIMES_UNTIL_HALF_SECOND) == 0 ? 0 : preDiv;     
 
-          if(display < cyclePeriod[CYCLE_PULSING_RED]-1)
-              display++;
+          if(display < cyclePeriod[CYCLE_PULSING_RED])
+            {
+            if(!preDiv)
+            {
+                
+                RELAY_GREEN_OFF;
+                RELAY_RED_TOGGLE;
+                RELAY_RETURN_TOGGLE;
+                if(digitalRead(RELAY_RED))
+                  display++;
+            }
+              
+          }
           else
           {
             RELAY_RED_OFF;
@@ -426,21 +488,6 @@ bool TaskUpdatesCounter(void *argument)
     }    
     return true; // to repeat the action - false to stop
 }
-
-//Task that updates the counter 1s period
-bool TaskUpdateSerial(void *argument) 
-{ 
-  // while (Serial.available()) 
-  // {
-  //   Serial1.write(Serial.read());
-  // }
-  // while(Serial1.available()) 
-  // { 
-  //   Serial.write(Serial1.read());
-  // }
-  return true; // to repeat the action - false to stop
-}
-
 
 /*==============================================================
 =======================OTHER FUNCTIONS==========================
@@ -516,18 +563,47 @@ void setup()
 
   //Init Serial Port
   Serial.begin(115200);
-  // while (!Serial);
 
-  timer.every(10000, TaskGetSwitchStatus);
-  timer.every(50000, TaskExecuteSwitch);
-  timer.every(100000, TaskUpdatesLeds);
-  timer.every(1000000, TaskUpdatesCounter);
-  timer.every(1000, TaskUpdatesDisplay);
-  // timer.every(100000, TaskUpdateSerial);
+  //Init TASKS PERIODS
 
+  
+  
+  // Serial.print(TASK_GET_SWITCH_STATUS_PERIOD);
+  // Serial.print(TASK_GET_SWITCH_STATUS_PERIOD);
+  // Serial.print(TASK_EXECUTE_SWITCH_PERIOD);
+  // Serial.print(TASK_UPDATE_LEDS_PERIOD);
+  // Serial.print(TASK_UPDATE_COUNTER_PERIOD);
+  // Serial.print(TASK_UPDATE_DISPLAY_PERIOD);
+
+  timer.every(TASK_GET_SWITCH_STATUS_PERIOD, TaskGetSwitchStatus);
+  timer.every(TASK_EXECUTE_SWITCH_PERIOD, TaskExecuteSwitch);
+  timer.every(TASK_UPDATE_LEDS_PERIOD, TaskUpdatesLeds);
+  timer.every(TASK_UPDATE_COUNTER_PERIOD, TaskUpdatesCounter);
+  timer.every(TASK_UPDATE_DISPLAY_PERIOD, TaskUpdatesDisplay);
 }
 
 void loop() 
 {
+
+  // Serial.write("\nCounting times to 1s: ");  
+  // Serial.print(COUNTING_TIMES_UNTIL_ONE_SECOND);
+
+  
+  // Serial.write("\nSwitch Status: ");  
+  // Serial.print(TASK_GET_SWITCH_STATUS_PERIOD);
+
+  // Serial.write("\nExecute Switch: ");
+  // Serial.print(TASK_EXECUTE_SWITCH_PERIOD);
+
+  // Serial.write("\nUpdate LEDs: ");
+  // Serial.print(TASK_UPDATE_LEDS_PERIOD);
+
+  // Serial.write("\nUpdate Counter: ");
+  // Serial.print(TASK_UPDATE_COUNTER_PERIOD);
+
+  // Serial.write("\nUpdate Display: ");
+  // Serial.print(TASK_UPDATE_DISPLAY_PERIOD);
+
   timer.tick();
+  // delay(1000)  ;
 }
