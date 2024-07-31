@@ -1,6 +1,9 @@
+/* Includes */
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/sys/printk.h>
+
+/* Defines */
 
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS   250
