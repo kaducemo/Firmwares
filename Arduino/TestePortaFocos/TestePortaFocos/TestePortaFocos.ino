@@ -2,6 +2,25 @@
  *    Firmware used to test semaphoric leds 
  *    AUTOR:   Carlos Eduardo Mayer de Oliveira
  *    DATA:    24/03/2025
+ *    Esta aplicação foi desenvolvida utilizando as seguintes placas:
+ *    1) Arduino Leonardo
+ *    2) Shield Multifunctions: https://blog.eletrogate.com/guia-completo-do-shield-multi-funcoes-para-arduino/
+ *    3) Shiel Relay: https://www.casadoresistor.com.br/modulo-rele-4-canais-arduino?gad_source=1&gclid=EAIaIQobChMI0f7BxdqijAMVzSZECB2QnxXtEAQYCCABEgJNkvD_BwE
+ *    Com isso respeitar as PINAGEM do Arduino e dos Shields. (Observar os defines)
+ *
+ *   Através da chave S1, podemos ciclar o modo de operação.:
+ *   OPMODE_OPERATING = 0, // Fazendo o Ciclo (VERDE-> VERMELHO PULSANTE - > VERMELHO)
+ *   OPMODE_CONF_RED_TIME,  // Configuração do tempo de vermelho
+ *   OPMODE_CONF_GREEN_TIME, // Configuração do Tempo de Verde
+ *   OPMODE_CONF_PULSE_TIME, // Configuração do tempo de Pulsante
+ *   OPMODE_CONF_PHASE_TEST // Acionamento independente das fases.
+ *
+ *    No modo OPERATING, se for pressionada S2 ou S3, o amarelo é acionado/desacionado.
+ *    Nos modos CONF, usar S2 e S3 para alterar os tempos.
+ *    No modo CONF_PHASE_TEST, usar S2 e S3 para acionar as fases Vermelha e Verde. Se
+ *    alguma das fases estiverem ligada nesse modo e for pressionada S1, então será
+ *    acionada/desacionada a fase amarela. Só será possível retornar ao modo OPERATING,
+ *    quando as fases (VD e VM) estiverem desligadas.
 */
 
 #include <arduino-timer.h>
