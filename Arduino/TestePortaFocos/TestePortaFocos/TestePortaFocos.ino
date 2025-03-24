@@ -1,7 +1,7 @@
 /*
  *    Firmware used to test semaphoric leds 
  *    AUTOR:   Carlos Eduardo Mayer de Oliveira
- *    DATA:    16/06/2024
+ *    DATA:    24/03/2025
 */
 
 #include <arduino-timer.h>
@@ -22,6 +22,7 @@
 #define RELAY_RETURN  5
 #define RELAY_RED     6
 #define RELAY_GREEN   9
+#define RELAY_YELLOW  A5
 
 
 //Switches
@@ -34,7 +35,7 @@
 #define SCKL    7 //SH_CP
 #define SER     8 //DS
 
-// Chose your Base time
+// Choose your Base time
 #define MICROSECONDS
 //#define MILLISECONDS
 
@@ -80,28 +81,31 @@
 #define DEBOUNCE_PERIOD_MS  20 // Debounce time in MILLISECONDS
 
 //MACROS
-#define LED_D1_OFF      digitalWrite(LED_D1, HIGH);
-#define LED_D2_OFF      digitalWrite(LED_D2, HIGH);
-#define LED_D3_OFF      digitalWrite(LED_D3, HIGH);
-#define LED_D4_OFF      digitalWrite(LED_D4, HIGH);
+#define LED_D1_OFF      digitalWrite(LED_D1, HIGH)
+#define LED_D2_OFF      digitalWrite(LED_D2, HIGH)
+#define LED_D3_OFF      digitalWrite(LED_D3, HIGH)
+#define LED_D4_OFF      digitalWrite(LED_D4, HIGH)
 
-#define LED_D1_ON      digitalWrite(LED_D1, LOW);
-#define LED_D2_ON      digitalWrite(LED_D2, LOW);
-#define LED_D3_ON      digitalWrite(LED_D3, LOW);
-#define LED_D4_ON      digitalWrite(LED_D4, LOW);
+#define LED_D1_ON      digitalWrite(LED_D1, LOW)
+#define LED_D2_ON      digitalWrite(LED_D2, LOW)
+#define LED_D3_ON      digitalWrite(LED_D3, LOW)
+#define LED_D4_ON      digitalWrite(LED_D4, LOW)
 
-#define RELAY_RETURN_OFF      digitalWrite(RELAY_RETURN, HIGH);
-#define RELAY_RED_OFF         digitalWrite(RELAY_RED, HIGH);
-#define RELAY_GREEN_OFF       digitalWrite(RELAY_GREEN, HIGH);
+#define RELAY_RETURN_OFF      digitalWrite(RELAY_RETURN, HIGH)
+#define RELAY_RED_OFF         digitalWrite(RELAY_RED, HIGH)
+#define RELAY_GREEN_OFF       digitalWrite(RELAY_GREEN, HIGH)
+#define RELAY_YELLOW_OFF      digitalWrite(RELAY_YELLOW, HIGH)
 
 
-#define RELAY_RETURN_ON       digitalWrite(RELAY_RETURN, LOW);
-#define RELAY_RED_ON          digitalWrite(RELAY_RED, LOW);
-#define RELAY_GREEN_ON        digitalWrite(RELAY_GREEN, LOW);
+#define RELAY_RETURN_ON       digitalWrite(RELAY_RETURN, LOW)
+#define RELAY_RED_ON          digitalWrite(RELAY_RED, LOW)
+#define RELAY_GREEN_ON        digitalWrite(RELAY_GREEN, LOW)
+#define RELAY_YELLOW_ON       digitalWrite(RELAY_YELLOW, HIGH)
 
-#define RELAY_RETURN_TOGGLE   digitalWrite(RELAY_RETURN,  !digitalRead(RELAY_RETURN));
-#define RELAY_RED_TOGGLE      digitalWrite(RELAY_RED,     !digitalRead(RELAY_RED));
-#define RELAY_GREEN_TOGGLE    digitalWrite(RELAY_GREEN,   !digitalRead(RELAY_GREEN);
+#define RELAY_RETURN_TOGGLE   digitalWrite(RELAY_RETURN,  !digitalRead(RELAY_RETURN))
+#define RELAY_RED_TOGGLE      digitalWrite(RELAY_RED,     !digitalRead(RELAY_RED))
+#define RELAY_GREEN_TOGGLE    digitalWrite(RELAY_GREEN,   !digitalRead(RELAY_GREEN))
+#define RELAY_YELLOW_TOGGLE    digitalWrite(RELAY_YELLOW, !digitalRead(RELAY_YELLOW))
 
 //TYPEDEFS
 
@@ -110,7 +114,8 @@ typedef enum
   OPMODE_OPERATING = 0,
   OPMODE_CONF_RED_TIME,  
   OPMODE_CONF_GREEN_TIME,
-  OPMODE_CONF_PULSE_TIME
+  OPMODE_CONF_PULSE_TIME,
+  OPMODE_CONF_PHASE_TEST
 }opMOde_t; // 0: operating mode, 1: config mode
 
 typedef enum
@@ -179,27 +184,37 @@ bool TaskExecuteSwitch(void *argument)
     switch(pressedSwitch)
     {
       case SWITCH_MODE:
-        opMOde = (opMOde+1) % (OPMODE_CONF_PULSE_TIME+1);
-        phaseCycle = CYCLE_RED;
-        display = 0;
-        preDiv = 0;
-        if(opMOde == OPMODE_OPERATING)
-        {
-          RELAY_RED_ON;
-          RELAY_GREEN_OFF;
-          RELAY_RETURN_ON;
-        }
+
+        if(opMOde == OPMODE_CONF_PHASE_TEST && (!digitalRead(RELAY_RED) || !digitalRead(!RELAY_GREEN)))        
+          RELAY_YELLOW_TOGGLE;      
+
         else
         {
-          RELAY_RED_OFF;
-          RELAY_GREEN_OFF;
-          RELAY_RETURN_OFF;
+          opMOde = (opMOde+1) % (OPMODE_CONF_PHASE_TEST+1);
+          phaseCycle = CYCLE_RED;
+          display = cyclePeriod[CYCLE_RED];
+          preDiv = 0;
+
+          if(opMOde == OPMODE_OPERATING)
+          {
+            RELAY_RED_ON;
+            RELAY_GREEN_OFF;
+            RELAY_RETURN_ON;
+          }
+
+          else
+          {
+            RELAY_RED_OFF;
+            RELAY_GREEN_OFF;
+            RELAY_RETURN_OFF;
+          }
         }
+        
         
         pressedSwitch = SWITCH_NONE;
         break;
 
-      case SWITCH_UP:
+      case SWITCH_UP:      
         if(opMOde == OPMODE_CONF_RED_TIME)
           cyclePeriod[CYCLE_RED]++;
 
@@ -208,20 +223,33 @@ bool TaskExecuteSwitch(void *argument)
 
         else if(opMOde == OPMODE_CONF_PULSE_TIME)
           cyclePeriod[CYCLE_PULSING_RED]++;
+        
+        else if(opMOde == OPMODE_OPERATING)
+          RELAY_YELLOW_TOGGLE;
+        
+        else if(opMOde == OPMODE_CONF_PHASE_TEST)
+          RELAY_RED_TOGGLE;
 
         pressedSwitch = SWITCH_NONE;
         break;
 
       case SWITCH_DOWN:
 
-      if(opMOde == OPMODE_CONF_RED_TIME)
-          cyclePeriod[CYCLE_RED]--;
+        if(opMOde == OPMODE_CONF_RED_TIME)
+            cyclePeriod[CYCLE_RED]--;
 
         else if(opMOde == OPMODE_CONF_GREEN_TIME)
           cyclePeriod[CYCLE_GREEN]--;
 
         else if(opMOde == OPMODE_CONF_PULSE_TIME)
           cyclePeriod[CYCLE_PULSING_RED]--;
+        
+        else if(opMOde == OPMODE_OPERATING)
+          RELAY_YELLOW_TOGGLE;
+        
+        else if(opMOde == OPMODE_CONF_PHASE_TEST)
+          RELAY_GREEN_TOGGLE;
+
         pressedSwitch = SWITCH_NONE;
         break;
     } 
@@ -348,8 +376,12 @@ bool TaskUpdatesDisplay(void *argument)
 {
     switch(opMOde)
     {
-      case OPMODE_OPERATING:        
-        displayNumber( display );
+      case OPMODE_OPERATING:  
+        if(display)      
+          displayNumber( display );
+        else
+          displayNumber( 1 );
+
         break;
       case OPMODE_CONF_GREEN_TIME:
         displayNumber(cyclePeriod[CYCLE_GREEN]);
@@ -399,6 +431,13 @@ bool TaskUpdatesLeds(void *argument)
       LED_D3_OFF;
       LED_D4_ON;
       break;
+    case OPMODE_CONF_PHASE_TEST:
+      LED_D1_ON;
+      LED_D2_ON;
+      LED_D3_ON;
+      LED_D4_ON;
+      RELAY_RETURN_ON;
+      break;
   }  
   return true; // to repeat the action - false to stop
 }
@@ -417,21 +456,38 @@ bool TaskUpdatesCounter(void *argument)
           RELAY_GREEN_OFF;
           RELAY_RETURN_ON;   
 
-          if(display < cyclePeriod[CYCLE_RED])
+          if(display)
           {
             if(!preDiv)
-              display++;
+              display--;
           }
             
           else
           {
             RELAY_RED_OFF;
-            RELAY_GREEN_OFF;
-            RELAY_RETURN_OFF;   
+            RELAY_GREEN_ON;
+            RELAY_RETURN_ON;   
 
-            display = 0;
+            display = cyclePeriod[CYCLE_GREEN];
             phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED + 1);
           }
+
+
+          // if(display < cyclePeriod[CYCLE_RED])
+          // {
+          //   if(!preDiv)
+          //     display++;
+          // }
+            
+          // else
+          // {
+          //   RELAY_RED_OFF;
+          //   RELAY_GREEN_OFF;
+          //   RELAY_RETURN_OFF;   
+
+          //   display = 0;
+          //   phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED + 1);
+          // }
           break;
 
         case CYCLE_GREEN:
@@ -440,18 +496,19 @@ bool TaskUpdatesCounter(void *argument)
           RELAY_GREEN_ON;
           RELAY_RETURN_ON;   
 
-          if(display < cyclePeriod[CYCLE_GREEN])
+          if(display)
           {
             if(!preDiv)
-              display++;
+              display--;
           }
           else
-          {
-            RELAY_RED_OFF;
+          {            
             RELAY_GREEN_OFF;
-            RELAY_RETURN_OFF;   
+            RELAY_RED_ON;
+            RELAY_RETURN_ON;   
 
-            display = 0;
+            display = cyclePeriod[CYCLE_PULSING_RED];
+
             phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED+1);
               if(!cyclePeriod[CYCLE_PULSING_RED])
                 phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED+1);
@@ -462,25 +519,25 @@ bool TaskUpdatesCounter(void *argument)
 
           preDiv = (preDiv % COUNTING_TIMES_UNTIL_HALF_SECOND) == 0 ? 0 : preDiv;     
 
-          if(display < cyclePeriod[CYCLE_PULSING_RED])
+          if(display)
             {
             if(!preDiv)
             {
                 
                 RELAY_GREEN_OFF;
-                RELAY_RED_TOGGLE;
+                RELAY_RED_TOGGLE;                
                 RELAY_RETURN_TOGGLE;
                 if(digitalRead(RELAY_RED))
-                  display++;
+                  display--;
             }
               
           }
           else
-          {
-            RELAY_RED_OFF;
-            RELAY_GREEN_OFF;
+          {            
+            RELAY_GREEN_OFF;  
+            RELAY_RED_OFF;          
             RELAY_RETURN_OFF;   
-            display = 0;
+            display = cyclePeriod[CYCLE_RED];
             phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED+1);
           }
           break;
@@ -530,7 +587,7 @@ void displayNumber(unsigned int number)
     {
       setDigit(i, number % 10, false); // display righmost 4 bits (1 digit)
       number = number / 10;  // roll on to the next digit
-      delay(1);
+      //delay(1);
     } 
 }
 
@@ -555,6 +612,12 @@ void setup()
   pinMode(RELAY_RETURN, OUTPUT);
   pinMode(RELAY_RED, OUTPUT);
   pinMode(RELAY_GREEN, OUTPUT); 
+  pinMode(RELAY_YELLOW, OUTPUT); 
+
+  RELAY_RED_OFF;
+  RELAY_GREEN_OFF;
+  RELAY_YELLOW_OFF;
+  RELAY_RETURN_OFF;   
 
   //Init Switches Pins
   pinMode(SWITCH_SW1, INPUT);
