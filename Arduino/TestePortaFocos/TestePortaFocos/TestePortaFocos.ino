@@ -1,7 +1,7 @@
 /*
  *    Firmware used to test semaphoric leds 
  *    AUTOR:   Carlos Eduardo Mayer de Oliveira
- *    DATA:    24/03/2025
+ *    DATA:    10/04/2025
  *    Esta aplicação foi desenvolvida utilizando as seguintes placas:
  *    1) Arduino Leonardo
  *    2) Shield Multifunctions: https://blog.eletrogate.com/guia-completo-do-shield-multi-funcoes-para-arduino/
@@ -15,12 +15,19 @@
  *   OPMODE_CONF_PULSE_TIME, // Configuração do tempo de Pulsante
  *   OPMODE_CONF_PHASE_TEST // Acionamento independente das fases.
  *
- *    No modo OPERATING, se for pressionada S2 ou S3, o amarelo é acionado/desacionado.
- *    Nos modos CONF, usar S2 e S3 para alterar os tempos.
+ *    No modo OPERATING, as chaves S2/S3 aumentam e diminuem o tempo
+ *    da FASE DO CICLO ATUAL (Verm, Verde, Piscante), embora a atualização só seja 
+ *    realizada no CICLO SEGUINTE. Além disso se a FASE atual for VERDE, ao invés de 
+ *    modificar o tempo de VERDE, será modificado o status de acionamento do AMARELO.
+ *    Nos modos CONF, usar S2 e S3 para alterar os tempos normalmente.
  *    No modo CONF_PHASE_TEST, usar S2 e S3 para acionar as fases Vermelha e Verde. Se
  *    alguma das fases estiverem ligada nesse modo e for pressionada S1, então será
- *    acionada/desacionada a fase amarela. Só será possível retornar ao modo OPERATING,
+ *    acionada/desacionada a fase AMARELA. Só será possível retornar ao modo OPERATING,
  *    quando as fases (VD e VM) estiverem desligadas.
+ *    Finalmente foi inserido uma definição VARIATION que faz o modo pulsante e cronometro
+ *    ficarem variando seus tempos de acionamento. Dessa forma se VARIATION = 0, não existe
+ *    variação, já se VARIATION = 1, o cronometro VERMELHO e o PISCANTE ficam variando entre
+ *    +1s - 0s -1s a cada ciclo.
 */
 
 #include <arduino-timer.h>
@@ -38,10 +45,10 @@
 #define LED_D4  10
 
 //Relays
-#define RELAY_RETURN  5
-#define RELAY_RED     6
-#define RELAY_GREEN   9
-#define RELAY_YELLOW  A5
+#define RELAY_RETURN  5 //IN1 (PLACA RELAYS)
+#define RELAY_RED     6 //IN3 (PLACA RELAYS)
+#define RELAY_GREEN   9 //IN2 (PLACA RELAYS)
+#define RELAY_YELLOW  A5 //IN4 (PLACA RELAYS)
 
 
 //Switches
@@ -54,7 +61,7 @@
 #define SCKL    7 //SH_CP
 #define SER     8 //DS
 
-// Choose your Base time
+// Choose your Base time TICK
 #define MICROSECONDS
 //#define MILLISECONDS
 
@@ -68,8 +75,19 @@
   #define MULT_FACTOR   1
 #endif
 
-// #define TICKS_TO_ONE_SECOND 1000 * MULT_FACTOR //TICKS to one second
-#define TICKS_TO_ONE_SECOND 1000000 //TICKS to one second
+#define TICKS_TO_1_SECOND 1000 * MULT_FACTOR //TICKS until we have 1s
+#define TICKS_TO_900_MS 900 * MULT_FACTOR //TICKS until we have 900ms
+#define TICKS_TO_800_MS 800 * MULT_FACTOR //TICKS until we have 800ms
+#define TICKS_TO_700_MS 700 * MULT_FACTOR //TICKS until we have 700ms
+#define TICKS_TO_600_MS 600 * MULT_FACTOR //TICKS until we have 600ms
+#define TICKS_TO_500_MS 500 * MULT_FACTOR //TICKS until we have 500ms
+#define TICKS_TO_400_MS 400 * MULT_FACTOR //TICKS until we have 400ms
+#define TICKS_TO_300_MS 300 * MULT_FACTOR //TICKS until we have 300ms
+#define TICKS_TO_200_MS 200 * MULT_FACTOR //TICKS until we have 200ms
+#define TICKS_TO_100_MS 100 * MULT_FACTOR //TICKS until we have 100ms
+
+
+
 
 #define TASK_GET_SWITCH_STATUS_MS   10
 #define TASK_EXECUTE_SWITCH_MS      50
@@ -83,19 +101,20 @@
 #define TASK_UPDATE_COUNTER_PERIOD      (TASK_UPDATE_COUNTER_MS * MULT_FACTOR)
 #define TASK_UPDATE_DISPLAY_PERIOD      (TASK_UPDATE_DISPLAY_MS * MULT_FACTOR)
 
-// #define TASK_GET_SWITCH_STATUS_PERIOD   10000
-// #define TASK_EXECUTE_SWITCH_PERIOD      50000
-// #define TASK_UPDATE_LEDS_PERIOD         100000
-// #define TASK_UPDATE_COUNTER_PERIOD      100000
-// #define TASK_UPDATE_DISPLAY_PERIOD      1000
 
-#define COUNTING_TIMES_UNTIL_ONE_SECOND   (TICKS_TO_ONE_SECOND/TASK_UPDATE_COUNTER_PERIOD) //Number of counting until we have 1s
-#define COUNTING_TIMES_UNTIL_HALF_SECOND  (COUNTING_TIMES_UNTIL_ONE_SECOND/2) //Duty cicle on pulsing red signal
+#define T_UPD_CNT_PREDIV_ONE_SECOND   (TICKS_TO_1_SECOND/TASK_UPDATE_COUNTER_PERIOD) -1 //Number PREEMPTION OF UPDATE COUNTER TASK until we have 1s
+#define T_UPD_CNT_PREDIV_900_MS       (TICKS_TO_900_MS/TASK_UPDATE_COUNTER_PERIOD) //Number PREEMPTION OF UPDATE COUNTER TASK until we have 900ms
+#define T_UPD_CNT_PREDIV_800_MS       (TICKS_TO_800_MS/TASK_UPDATE_COUNTER_PERIOD) //Number PREEMPTION OF UPDATE COUNTER TASK until we have 800ms
+#define T_UPD_CNT_PREDIV_700_MS       (TICKS_TO_700_MS/TASK_UPDATE_COUNTER_PERIOD) //Number PREEMPTION OF UPDATE COUNTER TASK until we have 700ms
+#define T_UPD_CNT_PREDIV_600_MS       (TICKS_TO_600_MS/TASK_UPDATE_COUNTER_PERIOD) //Number PREEMPTION OF UPDATE COUNTER TASK until we have 600ms
+#define T_UPD_CNT_PREDIV_500_MS       (TICKS_TO_500_MS/TASK_UPDATE_COUNTER_PERIOD) //Number PREEMPTION OF UPDATE COUNTER TASK until we have 500ms
+#define T_UPD_CNT_PREDIV_400_MS       (TICKS_TO_400_MS/TASK_UPDATE_COUNTER_PERIOD) //Number PREEMPTION OF UPDATE COUNTER TASK until we have 400ms
+#define T_UPD_CNT_PREDIV_300_MS       (TICKS_TO_300_MS/TASK_UPDATE_COUNTER_PERIOD) //Number PREEMPTION OF UPDATE COUNTER TASK until we have 400ms
+#define T_UPD_CNT_PREDIV_200_MS       (TICKS_TO_200_MS/TASK_UPDATE_COUNTER_PERIOD) //Number PREEMPTION OF UPDATE COUNTER TASK until we have 200ms
+#define T_UPD_CNT_PREDIV_100_MS       (TICKS_TO_100_MS/TASK_UPDATE_COUNTER_PERIOD) //Number PREEMPTION OF UPDATE COUNTER TASK until we have 100ms
 
-#define DEFAULT_RED_PHASE_PERIOD              10 //seconds
-#define DEFAULT_GREEN_PHASE_PERIOD            8
-#define DEFAULT_RED_PULSING_PHASE_PERIOD      4
-
+#define BLINK_ON_PERIOD   T_UPD_CNT_PREDIV_600_MS //Period ON During BLINK 
+#define BLINK_OFF_PERIOD  T_UPD_CNT_PREDIV_400_MS //Period OFF During BLINK
 
 #define DEBOUNCE_PERIOD_MS  20 // Debounce time in MILLISECONDS
 
@@ -119,12 +138,26 @@
 #define RELAY_RETURN_ON       digitalWrite(RELAY_RETURN, LOW)
 #define RELAY_RED_ON          digitalWrite(RELAY_RED, LOW)
 #define RELAY_GREEN_ON        digitalWrite(RELAY_GREEN, LOW)
-#define RELAY_YELLOW_ON       digitalWrite(RELAY_YELLOW, HIGH)
+#define RELAY_YELLOW_ON       digitalWrite(RELAY_YELLOW, LOW)
 
 #define RELAY_RETURN_TOGGLE   digitalWrite(RELAY_RETURN,  !digitalRead(RELAY_RETURN))
 #define RELAY_RED_TOGGLE      digitalWrite(RELAY_RED,     !digitalRead(RELAY_RED))
 #define RELAY_GREEN_TOGGLE    digitalWrite(RELAY_GREEN,   !digitalRead(RELAY_GREEN))
 #define RELAY_YELLOW_TOGGLE    digitalWrite(RELAY_YELLOW, !digitalRead(RELAY_YELLOW))
+
+#define DEFAULT_RED_PHASE_PERIOD              10 //seconds
+#define DEFAULT_GREEN_PHASE_PERIOD            8
+#define DEFAULT_RED_PULSING_PHASE_PERIOD      4
+
+#define MAX_RED_PHASE_PERIOD              300 //seconds
+#define MAX_GREEN_PHASE_PERIOD            300
+#define MAX_RED_PULSING_PHASE_PERIOD      300
+
+#define MIN_RED_PHASE_PERIOD              0 //seconds
+#define MIN_GREEN_PHASE_PERIOD            0
+#define MIN_RED_PULSING_PHASE_PERIOD      0
+
+
 
 //TYPEDEFS
 
@@ -163,17 +196,27 @@ Timer<5, micros> timer;     // 6 concurrent tasks, using micros as resolution
 Timer<5> timer;     // 6 concurrent tasks, using micros as resolution
 #endif
 
-unsigned int display        = 0; //Used to update 7 Seg display
+
+
+
+
 uint16_t preDiv = 0; //counting to one second counter
 opMOde_t opMOde             = OPMODE_OPERATING;
-phaseCycle_t phaseCycle     = CYCLE_RED;
 switch_t lastPressedSwitch  = SWITCH_NONE;
 switch_t pressedSwitch      = SWITCH_NONE;
 unsigned long initialDebounceTime[SWITCHES_NUMBER] = {0};  // the last time that each switch was pressed
 unsigned long lastDebounceTime[SWITCHES_NUMBER] = {0};  // the last time that each switch was pressed
+signed int countCycle = 0; //Conta até a VARIATION
+signed int risingOrFalling = 1; // Essa variavel fica variando entre 1 e -1. Onde 1 acrescenta pulsos e diminui cronometro, -1 faz o oposto.
+
 
 uint32_t cyclePeriod[] = {DEFAULT_RED_PHASE_PERIOD, DEFAULT_GREEN_PHASE_PERIOD, DEFAULT_RED_PULSING_PHASE_PERIOD};
 
+#define VARIATION   0 //Defina um valor para variar o período do cronometro (positivo e negativamente) e a quantidade pulsos a cada ciclo.
+#define INITIAL_CYCLE   CYCLE_RED
+
+phaseCycle_t phaseCycle     = INITIAL_CYCLE;
+unsigned int display        = ((INITIAL_CYCLE == CYCLE_GREEN) ? DEFAULT_GREEN_PHASE_PERIOD : ((INITIAL_CYCLE == CYCLE_RED) ? DEFAULT_RED_PHASE_PERIOD : DEFAULT_RED_PULSING_PHASE_PERIOD)); //Used to update 7 Seg display
 
 
 
@@ -192,43 +235,54 @@ int hexDigitValue[] =
     0xF6     /* Segments to light for 9  */
 };
 
+
+
+
+
+
 /*==============================================================
 ========================TASKS===================================
 ==============================================================*/
 
 //Executes Switches Comands - 50ms period
 bool TaskExecuteSwitch(void *argument) 
-{        
-
+{
     switch(pressedSwitch)
     {
-      case SWITCH_MODE:
+      case SWITCH_MODE: 
 
-        if(opMOde == OPMODE_CONF_PHASE_TEST && (!digitalRead(RELAY_RED) || !digitalRead(!RELAY_GREEN)))        
-          RELAY_YELLOW_TOGGLE;      
-
-        else
+        if(opMOde != OPMODE_CONF_PHASE_TEST)
         {
           opMOde = (opMOde+1) % (OPMODE_CONF_PHASE_TEST+1);
-          phaseCycle = CYCLE_RED;
-          display = cyclePeriod[CYCLE_RED];
-          preDiv = 0;
+          phaseCycle = INITIAL_CYCLE;
+          display = cyclePeriod[INITIAL_CYCLE];
+          preDiv = 0; 
 
-          if(opMOde == OPMODE_OPERATING)
+          RELAY_YELLOW_OFF;
+          RELAY_RED_OFF;
+          RELAY_GREEN_OFF;
+          RELAY_RETURN_OFF;
+        }   
+
+        else if(opMOde == OPMODE_CONF_PHASE_TEST)
+        {        
+          if(!digitalRead(RELAY_GREEN) && !digitalRead(RELAY_RED))
           {
-            RELAY_RED_ON;
-            RELAY_GREEN_OFF;
+            RELAY_YELLOW_TOGGLE;
+          }
+          else
+          {          
+            opMOde = OPMODE_OPERATING;
+            phaseCycle = INITIAL_CYCLE;
+            display = cyclePeriod[INITIAL_CYCLE];
+            preDiv = 0;           
+
+            RELAY_RED_OFF;
+            RELAY_YELLOW_OFF;
+            RELAY_GREEN_ON;
             RELAY_RETURN_ON;
           }
-
-          else
-          {
-            RELAY_RED_OFF;
-            RELAY_GREEN_OFF;
-            RELAY_RETURN_OFF;
-          }
-        }
-        
+        }          
         
         pressedSwitch = SWITCH_NONE;
         break;
@@ -244,7 +298,27 @@ bool TaskExecuteSwitch(void *argument)
           cyclePeriod[CYCLE_PULSING_RED]++;
         
         else if(opMOde == OPMODE_OPERATING)
-          RELAY_YELLOW_TOGGLE;
+        {
+          switch (phaseCycle)
+          {
+            case CYCLE_RED:
+            {
+              cyclePeriod[CYCLE_RED] = cyclePeriod[CYCLE_RED] < MAX_RED_PHASE_PERIOD ? cyclePeriod[CYCLE_RED]+1 : MAX_RED_PHASE_PERIOD;
+              break;
+
+            }
+            case CYCLE_GREEN:
+            {              
+              RELAY_YELLOW_TOGGLE;
+              break;
+            }
+            case CYCLE_PULSING_RED:
+            {
+              cyclePeriod[CYCLE_PULSING_RED] = cyclePeriod[CYCLE_PULSING_RED] < MAX_RED_PULSING_PHASE_PERIOD ? cyclePeriod[CYCLE_PULSING_RED]+1 : MAX_RED_PULSING_PHASE_PERIOD;
+              break;
+            }
+          }            
+        }          
         
         else if(opMOde == OPMODE_CONF_PHASE_TEST)
           RELAY_RED_TOGGLE;
@@ -264,7 +338,25 @@ bool TaskExecuteSwitch(void *argument)
           cyclePeriod[CYCLE_PULSING_RED]--;
         
         else if(opMOde == OPMODE_OPERATING)
-          RELAY_YELLOW_TOGGLE;
+          switch (phaseCycle)
+          {
+            case CYCLE_RED:
+            {
+              cyclePeriod[CYCLE_RED] = cyclePeriod[CYCLE_RED] > MIN_RED_PHASE_PERIOD ? cyclePeriod[CYCLE_RED]-1 : MIN_RED_PHASE_PERIOD;
+              break;
+
+            }
+            case CYCLE_GREEN:
+            {              
+              RELAY_YELLOW_TOGGLE;
+              break;
+            }
+            case CYCLE_PULSING_RED:
+            {
+              cyclePeriod[CYCLE_PULSING_RED] = cyclePeriod[CYCLE_PULSING_RED] > MIN_RED_PULSING_PHASE_PERIOD ? cyclePeriod[CYCLE_PULSING_RED]-1 : MIN_RED_PULSING_PHASE_PERIOD;
+              break;
+            }
+          }            
         
         else if(opMOde == OPMODE_CONF_PHASE_TEST)
           RELAY_GREEN_TOGGLE;
@@ -464,9 +556,10 @@ bool TaskUpdatesLeds(void *argument)
 //Task that updates counter
 bool TaskUpdatesCounter(void *argument) 
 { 
+
     if(opMOde == OPMODE_OPERATING)
     {
-      preDiv = (++preDiv) % COUNTING_TIMES_UNTIL_ONE_SECOND;
+      preDiv = (++preDiv) % (T_UPD_CNT_PREDIV_ONE_SECOND);
       
       switch(phaseCycle)
       {
@@ -483,14 +576,17 @@ bool TaskUpdatesCounter(void *argument)
             
           else
           {
-            RELAY_RED_OFF;
-            RELAY_GREEN_ON;
-            RELAY_RETURN_ON;   
+            if(!preDiv)
+            {
+              RELAY_RED_OFF;
+              RELAY_GREEN_ON;
+              RELAY_RETURN_ON;   
 
-            display = cyclePeriod[CYCLE_GREEN];
-            phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED + 1);
+              display = cyclePeriod[CYCLE_GREEN];
+              phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED + 1);
+            }
+            
           }
-
 
           // if(display < cyclePeriod[CYCLE_RED])
           // {
@@ -521,43 +617,96 @@ bool TaskUpdatesCounter(void *argument)
               display--;
           }
           else
-          {            
-            RELAY_GREEN_OFF;
-            RELAY_RED_ON;
-            RELAY_RETURN_ON;   
+          {
+            if(!preDiv)
+            {
+              //unsigned int countCycle = 0; //Conta até a VARIATION              
 
-            display = cyclePeriod[CYCLE_PULSING_RED];
+              
 
-            phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED+1);
+              //countCycle = 1;
+
+              
+
+              // if(!countCycle)
+              //   risingOrFalling *= -1;
+
+              RELAY_GREEN_OFF;
+              RELAY_RED_ON;
+              RELAY_RETURN_ON;                
+
+              countCycle = risingOrFalling * ((++countCycle) % (VARIATION+1));
+
+              Serial.write("\nCounting: ");
+              Serial.print(countCycle);
+
+              if(!countCycle)
+                risingOrFalling *= -1;
+
+              //cyclePeriod[CYCLE_PULSING_RED] = cyclePeriod[CYCLE_PULSING_RED] + countCycle;              
+
+              display = cyclePeriod[CYCLE_PULSING_RED] + countCycle;
+
+              Serial.write("\nCYCLE_PULSING_RED: ");
+              Serial.print(display);
+
+              
+
+              phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED+1);
               if(!cyclePeriod[CYCLE_PULSING_RED])
                 phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED+1);
+
+            } 
           }
           break;
 
         case CYCLE_PULSING_RED:
 
-          preDiv = (preDiv % COUNTING_TIMES_UNTIL_HALF_SECOND) == 0 ? 0 : preDiv;     
+        if(!digitalRead(RELAY_RED))
+        {
+          preDiv = (preDiv % BLINK_ON_PERIOD) == 0 ? 0 : preDiv;  
+          //Serial.write("\nON: ");
+          //Serial.print(preDiv);
+        }
+          
+        else
+        {
+          preDiv = (preDiv % BLINK_OFF_PERIOD) == 0 ? 0 : preDiv;  
+          //Serial.write("\nOFF: ");
+          //Serial.print(preDiv);
+        }      
 
           if(display)
             {
-            if(!preDiv)
-            {
-                
-                RELAY_GREEN_OFF;
-                RELAY_RED_TOGGLE;                
-                RELAY_RETURN_TOGGLE;
-                if(digitalRead(RELAY_RED))
-                  display--;
-            }
+              if(!preDiv)
+              {
+                  
+                  RELAY_GREEN_OFF;
+                  RELAY_RED_TOGGLE;                
+                  RELAY_RETURN_TOGGLE;
+                  if(digitalRead(RELAY_RED))
+                    display--;
+              }
               
           }
           else
-          {            
-            RELAY_GREEN_OFF;  
-            RELAY_RED_OFF;          
-            RELAY_RETURN_OFF;   
-            display = cyclePeriod[CYCLE_RED];
-            phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED+1);
+          { 
+            if(!preDiv)
+            {
+
+              RELAY_GREEN_OFF;  
+              RELAY_RED_ON;          
+              RELAY_RETURN_ON;   
+              
+              
+              //display = cyclePeriod[CYCLE_RED];
+              display = cyclePeriod[CYCLE_RED] - countCycle;
+
+              Serial.write("\nCYCLE_RED: ");
+              Serial.print(display);
+
+              phaseCycle = (phaseCycle+1) % (CYCLE_PULSING_RED+1);
+            }            
           }
           break;
       }      
@@ -662,6 +811,9 @@ void setup()
   timer.every(TASK_UPDATE_LEDS_PERIOD, TaskUpdatesLeds);
   timer.every(TASK_UPDATE_COUNTER_PERIOD, TaskUpdatesCounter);
   timer.every(TASK_UPDATE_DISPLAY_PERIOD, TaskUpdatesDisplay);
+
+  // Serial.write("\nCYCLE_PULSING_RED: ");
+  // Serial.print(cyclePeriod[CYCLE_RED]);
 }
 
 void loop() 
@@ -684,7 +836,7 @@ void loop()
   // Serial.print(TASK_UPDATE_COUNTER_PERIOD);
 
   // Serial.write("\nUpdate Display: ");
-  // Serial.print(TASK_UPDATE_DISPLAY_PERIOD);
+  // Serial.print(TASK_UPDATE_DISPLAY_PERIOD);   
 
   timer.tick();
   // delay(1000)  ;
