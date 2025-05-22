@@ -1,0 +1,2 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:1359:1:br_i31_zero	16	static
+../source/BearSSL/src/ec/ecdsa_i31_vrfy_raw.c:32:1:br_ecdsa_i31_vrfy_raw	728	static

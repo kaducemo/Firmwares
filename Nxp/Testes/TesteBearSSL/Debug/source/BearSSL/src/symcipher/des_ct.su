@@ -1,0 +1,9 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
+../source/BearSSL/src/symcipher/des_ct.c:64:1:rotl	16	static
+../source/BearSSL/src/symcipher/des_ct.c:73:1:keysched_unit	40	static
+../source/BearSSL/src/symcipher/des_ct.c:158:1:br_des_ct_keysched	24	static
+../source/BearSSL/src/symcipher/des_ct.c:184:1:Fconf	168	static
+../source/BearSSL/src/symcipher/des_ct.c:347:1:process_block_unit	40	static
+../source/BearSSL/src/symcipher/des_ct.c:368:1:br_des_ct_process_block	40	static
+../source/BearSSL/src/symcipher/des_ct.c:389:1:br_des_ct_skey_expand	48	static

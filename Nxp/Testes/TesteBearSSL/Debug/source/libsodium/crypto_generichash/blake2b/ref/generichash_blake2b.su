@@ -1,0 +1,7 @@
+../source/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c:12:1:crypto_generichash_blake2b	40	static
+../source/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c:28:1:crypto_generichash_blake2b_salt_personal	48	static
+../source/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c:46:1:crypto_generichash_blake2b_init	24	static
+../source/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c:69:1:crypto_generichash_blake2b_init_salt_personal	32	static
+../source/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c:95:1:crypto_generichash_blake2b_update	24	static
+../source/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c:104:1:crypto_generichash_blake2b_final	24	static
+../source/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c:113:1:_crypto_generichash_blake2b_pick_best_implementation	8	static

@@ -1,0 +1,9 @@
+../source/libsodium/randombytes/sysrandom/randombytes_sysrandom.c:127:1:safe_read	32	static
+../source/libsodium/randombytes/sysrandom/randombytes_sysrandom.c:178:1:randombytes_sysrandom_random_dev_open	104	static
+../source/libsodium/randombytes/sysrandom/randombytes_sysrandom.c:262:1:randombytes_sysrandom_init	16	static
+../source/libsodium/randombytes/sysrandom/randombytes_sysrandom.c:295:1:randombytes_sysrandom_stir	8	static
+../source/libsodium/randombytes/sysrandom/randombytes_sysrandom.c:304:1:randombytes_sysrandom_stir_if_needed	8	static
+../source/libsodium/randombytes/sysrandom/randombytes_sysrandom.c:312:1:randombytes_sysrandom_close	16	static
+../source/libsodium/randombytes/sysrandom/randombytes_sysrandom.c:338:1:randombytes_sysrandom_buf	16	static
+../source/libsodium/randombytes/sysrandom/randombytes_sysrandom.c:372:1:randombytes_sysrandom	16	static
+../source/libsodium/randombytes/sysrandom/randombytes_sysrandom.c:384:1:randombytes_sysrandom_implementation_name	4	static

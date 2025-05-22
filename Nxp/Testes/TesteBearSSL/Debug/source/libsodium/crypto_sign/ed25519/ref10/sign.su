@@ -1,0 +1,11 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:79:1:fe25519_sub	64	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:148:1:fe25519_cmov	112	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:198:1:fe25519_cswap	152	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:348:1:fe25519_mul	4552	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:618:1:fe25519_sq	2704	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:790:1:fe25519_sq2	2784	static
+../source/libsodium/crypto_sign/ed25519/ref10/sign.c:12:1:_crypto_sign_ed25519_ref10_hinit	16	static
+../source/libsodium/crypto_sign/ed25519/ref10/sign.c:28:1:_crypto_sign_ed25519_clamp	16	static
+../source/libsodium/crypto_sign/ed25519/ref10/sign.c:50:1:_crypto_sign_ed25519_detached	584	static
+../source/libsodium/crypto_sign/ed25519/ref10/sign.c:97:1:crypto_sign_ed25519_detached	40	static
+../source/libsodium/crypto_sign/ed25519/ref10/sign.c:105:1:crypto_sign_ed25519	56	static

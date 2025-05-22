@@ -1,0 +1,2 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1663:1:br_ssl_engine_set_ec	16	static
+../source/BearSSL/src/ssl/ssl_engine_default_ec.c:29:1:br_ssl_engine_set_default_ec	16	static

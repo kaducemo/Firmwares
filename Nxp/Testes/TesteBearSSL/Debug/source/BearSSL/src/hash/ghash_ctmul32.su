@@ -1,0 +1,5 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
+../source/BearSSL/src/hash/ghash_ctmul32.c:49:1:bmul32	64	static
+../source/BearSSL/src/hash/ghash_ctmul32.c:78:1:rev32	16	static
+../source/BearSSL/src/hash/ghash_ctmul32.c:96:1:br_ghash_ctmul32	400	static

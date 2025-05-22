@@ -1,0 +1,5 @@
+../source/libsodium/crypto_pwhash/argon2/argon2-core.h:139:17:index_alpha	120	static
+../source/libsodium/crypto_pwhash/argon2/argon2-encoding.c:39:1:decode_decimal	32	static
+../source/libsodium/crypto_pwhash/argon2/argon2-encoding.c:94:1:argon2_decode_string	128	static
+../source/libsodium/crypto_pwhash/argon2/argon2-encoding.c:214:1:u32_to_string	32	static
+../source/libsodium/crypto_pwhash/argon2/argon2-encoding.c:241:1:argon2_encode_string	136	static

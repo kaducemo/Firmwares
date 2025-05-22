@@ -1,0 +1,2 @@
+../source/libsodium/crypto_hash/sha512/hash_sha512.c:4:1:crypto_hash_sha512_bytes	4	static
+../source/libsodium/crypto_hash/sha512/hash_sha512.c:10:1:crypto_hash_sha512_statebytes	4	static

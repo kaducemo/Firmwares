@@ -1,0 +1,2 @@
+../source/BearSSL/src/symcipher/des_ct_cbcenc.c:29:1:br_des_ct_cbcenc_init	24	static
+../source/BearSSL/src/symcipher/des_ct_cbcenc.c:38:1:br_des_ct_cbcenc_run	1200	static

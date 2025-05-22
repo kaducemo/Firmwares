@@ -1,0 +1,8 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:44:1:rotl32	16	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:113:1:load32_le	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:130:1:store32_le	16	static
+../source/libsodium/crypto_core/hchacha20/core_hchacha20.c:17:1:crypto_core_hchacha20	96	static
+../source/libsodium/crypto_core/hchacha20/core_hchacha20.c:72:1:crypto_core_hchacha20_outputbytes	4	static
+../source/libsodium/crypto_core/hchacha20/core_hchacha20.c:78:1:crypto_core_hchacha20_inputbytes	4	static
+../source/libsodium/crypto_core/hchacha20/core_hchacha20.c:84:1:crypto_core_hchacha20_keybytes	4	static
+../source/libsodium/crypto_core/hchacha20/core_hchacha20.c:90:1:crypto_core_hchacha20_constbytes	4	static

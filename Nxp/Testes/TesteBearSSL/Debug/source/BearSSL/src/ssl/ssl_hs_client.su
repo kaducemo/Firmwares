@@ -1,0 +1,12 @@
+../source/BearSSL/src/ssl/ssl_hs_client.c:13:1:t0_parse7E_unsigned	24	static
+../source/BearSSL/src/ssl/ssl_hs_client.c:30:1:t0_parse7E_signed	32	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\inc/bearssl_hash.h:1164:1:br_multihash_getimpl	16	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:478:1:br_enc16be	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:701:1:br_multihash_copyimpl	16	static
+../source/BearSSL/src/ssl/ssl_hs_client.c:104:1:make_pms_rsa	40	static
+../source/BearSSL/src/ssl/ssl_hs_client.c:191:1:verify_SKE_sig	584	static
+../source/BearSSL/src/ssl/ssl_hs_client.c:264:1:make_pms_ecdh	288	static
+../source/BearSSL/src/ssl/ssl_hs_client.c:341:1:make_pms_static_ecdh	168	static
+../source/BearSSL/src/ssl/ssl_hs_client.c:372:1:make_client_sign	40	static
+../source/BearSSL/src/ssl/ssl_hs_client.c:900:1:br_ssl_hs_client_init_main	40	static
+../source/BearSSL/src/ssl/ssl_hs_client.c:905:1:br_ssl_hs_client_run	648	static

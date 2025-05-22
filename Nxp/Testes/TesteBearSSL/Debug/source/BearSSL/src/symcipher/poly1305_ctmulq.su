@@ -1,0 +1,1 @@
+../source/BearSSL/src/symcipher/poly1305_ctmulq.c:470:1:br_poly1305_ctmulq_get	4	static

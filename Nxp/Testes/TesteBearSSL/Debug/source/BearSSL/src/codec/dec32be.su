@@ -1,0 +1,2 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
+../source/BearSSL/src/codec/dec32be.c:29:1:br_range_dec32be	40	static

@@ -1,0 +1,5 @@
+../source/libsodium/crypto_shorthash/crypto_shorthash.c:6:1:crypto_shorthash_bytes	4	static
+../source/libsodium/crypto_shorthash/crypto_shorthash.c:12:1:crypto_shorthash_keybytes	4	static
+../source/libsodium/crypto_shorthash/crypto_shorthash.c:18:1:crypto_shorthash_primitive	4	static
+../source/libsodium/crypto_shorthash/crypto_shorthash.c:24:1:crypto_shorthash	32	static
+../source/libsodium/crypto_shorthash/crypto_shorthash.c:31:1:crypto_shorthash_keygen	16	static

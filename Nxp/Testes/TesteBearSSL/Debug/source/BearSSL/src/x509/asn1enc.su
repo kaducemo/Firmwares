@@ -1,0 +1,3 @@
+../source/BearSSL/src/x509/asn1enc.c:29:1:br_asn1_uint_prepare	40	static
+../source/BearSSL/src/x509/asn1enc.c:50:1:br_asn1_encode_length	32	static
+../source/BearSSL/src/x509/asn1enc.c:78:1:br_asn1_encode_uint	32	static

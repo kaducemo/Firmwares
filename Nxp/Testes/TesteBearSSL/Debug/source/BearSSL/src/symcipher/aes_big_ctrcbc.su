@@ -1,0 +1,8 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
+../source/BearSSL/src/symcipher/aes_big_ctrcbc.c:29:1:br_aes_big_ctrcbc_init	24	static
+../source/BearSSL/src/symcipher/aes_big_ctrcbc.c:37:1:xorbuf	32	static
+../source/BearSSL/src/symcipher/aes_big_ctrcbc.c:51:1:br_aes_big_ctrcbc_ctr	72	static
+../source/BearSSL/src/symcipher/aes_big_ctrcbc.c:91:1:br_aes_big_ctrcbc_mac	32	static
+../source/BearSSL/src/symcipher/aes_big_ctrcbc.c:107:1:br_aes_big_ctrcbc_encrypt	24	static
+../source/BearSSL/src/symcipher/aes_big_ctrcbc.c:116:1:br_aes_big_ctrcbc_decrypt	24	static

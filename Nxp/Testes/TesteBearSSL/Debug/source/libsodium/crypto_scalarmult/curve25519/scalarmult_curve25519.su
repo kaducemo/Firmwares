@@ -1,0 +1,5 @@
+../source/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.c:15:1:crypto_scalarmult_curve25519	32	static
+../source/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.c:31:1:crypto_scalarmult_curve25519_base	16	static
+../source/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.c:38:1:crypto_scalarmult_curve25519_bytes	4	static
+../source/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.c:44:1:crypto_scalarmult_curve25519_scalarbytes	4	static
+../source/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.c:50:1:_crypto_scalarmult_curve25519_pick_best_implementation	4	static

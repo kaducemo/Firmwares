@@ -1,0 +1,6 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:95:1:store64_le	24	static
+../source/libsodium/crypto_kdf/blake2b/kdf_blake2b.c:8:1:crypto_kdf_blake2b_bytes_min	4	static
+../source/libsodium/crypto_kdf/blake2b/kdf_blake2b.c:14:1:crypto_kdf_blake2b_bytes_max	4	static
+../source/libsodium/crypto_kdf/blake2b/kdf_blake2b.c:20:1:crypto_kdf_blake2b_contextbytes	4	static
+../source/libsodium/crypto_kdf/blake2b/kdf_blake2b.c:26:1:crypto_kdf_blake2b_keybytes	4	static
+../source/libsodium/crypto_kdf/blake2b/kdf_blake2b.c:31:5:crypto_kdf_blake2b_derive_from_key	80	static

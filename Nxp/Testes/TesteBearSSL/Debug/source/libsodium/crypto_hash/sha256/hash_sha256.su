@@ -1,0 +1,2 @@
+../source/libsodium/crypto_hash/sha256/hash_sha256.c:4:1:crypto_hash_sha256_bytes	4	static
+../source/libsodium/crypto_hash/sha256/hash_sha256.c:10:1:crypto_hash_sha256_statebytes	4	static

@@ -1,0 +1,12 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:58:1:rotr32	16	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:167:1:store64_be	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:185:1:load32_be	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:202:1:store32_be	16	static
+../source/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c:41:1:be32enc_vect	32	static
+../source/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c:51:1:be32dec_vect	40	static
+../source/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c:98:1:SHA256_Transform	40	static
+../source/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c:154:1:SHA256_Pad	24	static
+../source/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c:177:1:crypto_hash_sha256_init	16	static
+../source/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c:191:1:crypto_hash_sha256_update	440	static
+../source/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c:233:1:crypto_hash_sha256_final	304	static
+../source/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c:246:1:crypto_hash_sha256	128	static

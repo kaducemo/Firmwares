@@ -1,0 +1,17 @@
+../source/libsodium/crypto_sign/crypto_sign.c:5:1:crypto_sign_statebytes	4	static
+../source/libsodium/crypto_sign/crypto_sign.c:11:1:crypto_sign_bytes	4	static
+../source/libsodium/crypto_sign/crypto_sign.c:17:1:crypto_sign_seedbytes	4	static
+../source/libsodium/crypto_sign/crypto_sign.c:23:1:crypto_sign_publickeybytes	4	static
+../source/libsodium/crypto_sign/crypto_sign.c:29:1:crypto_sign_secretkeybytes	4	static
+../source/libsodium/crypto_sign/crypto_sign.c:35:1:crypto_sign_messagebytes_max	4	static
+../source/libsodium/crypto_sign/crypto_sign.c:41:1:crypto_sign_primitive	4	static
+../source/libsodium/crypto_sign/crypto_sign.c:47:1:crypto_sign_seed_keypair	24	static
+../source/libsodium/crypto_sign/crypto_sign.c:54:1:crypto_sign_keypair	16	static
+../source/libsodium/crypto_sign/crypto_sign.c:60:1:crypto_sign	40	static
+../source/libsodium/crypto_sign/crypto_sign.c:68:1:crypto_sign_open	40	static
+../source/libsodium/crypto_sign/crypto_sign.c:76:1:crypto_sign_detached	40	static
+../source/libsodium/crypto_sign/crypto_sign.c:84:1:crypto_sign_verify_detached	32	static
+../source/libsodium/crypto_sign/crypto_sign.c:91:1:crypto_sign_init	16	static
+../source/libsodium/crypto_sign/crypto_sign.c:97:1:crypto_sign_update	24	static
+../source/libsodium/crypto_sign/crypto_sign.c:104:1:crypto_sign_final_create	24	static
+../source/libsodium/crypto_sign/crypto_sign.c:111:1:crypto_sign_final_verify	24	static

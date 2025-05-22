@@ -1,0 +1,12 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:596:1:br_enc64be	32	static
+../source/BearSSL/src/hash/sha2small.c:70:1:br_sha2small_round	376	static
+../source/BearSSL/src/hash/sha2small.c:203:1:sha2small_update	56	static
+../source/BearSSL/src/hash/sha2small.c:230:1:sha2small_out	136	static
+../source/BearSSL/src/hash/sha2small.c:254:1:br_sha224_init	16	static
+../source/BearSSL/src/hash/sha2small.c:263:1:br_sha224_update	24	static
+../source/BearSSL/src/hash/sha2small.c:270:1:br_sha224_out	16	static
+../source/BearSSL/src/hash/sha2small.c:277:1:br_sha224_state	16	static
+../source/BearSSL/src/hash/sha2small.c:285:1:br_sha224_set_state	24	static
+../source/BearSSL/src/hash/sha2small.c:293:1:br_sha256_init	16	static
+../source/BearSSL/src/hash/sha2small.c:302:1:br_sha256_out	16	static

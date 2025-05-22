@@ -1,0 +1,2 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:2775:1:br_ssl_client_set_rsapub	16	static
+../source/BearSSL/src/ssl/ssl_client_default_rsapub.c:29:1:br_ssl_client_set_default_rsapub	16	static

@@ -1,0 +1,12 @@
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:9:1:crypto_sign_ed25519ph_statebytes	4	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:15:1:crypto_sign_ed25519_bytes	4	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:21:1:crypto_sign_ed25519_seedbytes	4	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:27:1:crypto_sign_ed25519_publickeybytes	4	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:33:1:crypto_sign_ed25519_secretkeybytes	4	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:39:1:crypto_sign_ed25519_messagebytes_max	4	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:45:1:crypto_sign_ed25519_sk_to_seed	16	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:53:1:crypto_sign_ed25519_sk_to_pk	16	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:61:1:crypto_sign_ed25519ph_init	16	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:68:1:crypto_sign_ed25519ph_update	24	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:75:1:crypto_sign_ed25519ph_final_create	104	static
+../source/libsodium/crypto_sign/ed25519/sign_ed25519.c:88:1:crypto_sign_ed25519ph_final_verify	96	static

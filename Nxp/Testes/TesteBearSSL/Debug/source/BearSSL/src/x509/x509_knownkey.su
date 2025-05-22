@@ -1,0 +1,8 @@
+../source/BearSSL/src/x509/x509_knownkey.c:29:1:br_x509_knownkey_init_rsa	24	static
+../source/BearSSL/src/x509/x509_knownkey.c:40:1:br_x509_knownkey_init_ec	24	static
+../source/BearSSL/src/x509/x509_knownkey.c:50:1:kk_start_chain	16	static
+../source/BearSSL/src/x509/x509_knownkey.c:57:1:kk_start_cert	16	static
+../source/BearSSL/src/x509/x509_knownkey.c:64:1:kk_append	24	static
+../source/BearSSL/src/x509/x509_knownkey.c:72:1:kk_end_cert	16	static
+../source/BearSSL/src/x509/x509_knownkey.c:78:1:kk_end_chain	16	static
+../source/BearSSL/src/x509/x509_knownkey.c:85:1:kk_get_pkey	24	static

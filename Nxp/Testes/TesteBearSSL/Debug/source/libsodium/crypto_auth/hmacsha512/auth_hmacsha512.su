@@ -1,0 +1,9 @@
+../source/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c:13:1:crypto_auth_hmacsha512_bytes	4	static
+../source/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c:19:1:crypto_auth_hmacsha512_keybytes	4	static
+../source/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c:25:1:crypto_auth_hmacsha512_statebytes	4	static
+../source/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c:31:1:crypto_auth_hmacsha512_keygen	16	static
+../source/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c:37:1:crypto_auth_hmacsha512_init	232	static
+../source/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c:72:1:crypto_auth_hmacsha512_update	24	static
+../source/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c:81:1:crypto_auth_hmacsha512_final	80	static
+../source/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c:96:1:crypto_auth_hmacsha512	448	static
+../source/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c:109:1:crypto_auth_hmacsha512_verify	104	static

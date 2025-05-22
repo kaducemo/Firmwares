@@ -1,0 +1,2 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:1513:1:br_i15_zero	16	static
+../source/BearSSL/src/rsa/rsa_i15_modulus.c:29:1:br_rsa_i15_compute_modulus	1160	static

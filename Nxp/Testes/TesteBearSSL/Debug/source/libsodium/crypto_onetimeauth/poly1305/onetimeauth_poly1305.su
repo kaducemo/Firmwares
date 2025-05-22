@@ -1,0 +1,10 @@
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:18:1:crypto_onetimeauth_poly1305	40	static
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:25:1:crypto_onetimeauth_poly1305_verify	40	static
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:34:1:crypto_onetimeauth_poly1305_init	16	static
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:41:1:crypto_onetimeauth_poly1305_update	32	static
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:49:1:crypto_onetimeauth_poly1305_final	16	static
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:56:1:crypto_onetimeauth_poly1305_bytes	4	static
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:62:1:crypto_onetimeauth_poly1305_keybytes	4	static
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:68:1:crypto_onetimeauth_poly1305_statebytes	4	static
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:74:1:crypto_onetimeauth_poly1305_keygen	16	static
+../source/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c:81:1:_crypto_onetimeauth_poly1305_pick_best_implementation	4	static

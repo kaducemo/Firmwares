@@ -1,0 +1,4 @@
+../source/libsodium/crypto_box/crypto_box_seal.c:10:1:_crypto_box_seal_nonce	472	static
+../source/libsodium/crypto_box/crypto_box_seal.c:24:1:crypto_box_seal	136	static
+../source/libsodium/crypto_box/crypto_box_seal.c:47:1:crypto_box_seal_open	72	static
+../source/libsodium/crypto_box/crypto_box_seal.c:65:1:crypto_box_sealbytes	4	static

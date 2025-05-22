@@ -1,0 +1,9 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:518:1:br_enc32le	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:582:1:br_enc64le	40	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:596:1:br_enc64be	32	static
+../source/BearSSL/src/hash/md5sha1.c:29:1:br_md5sha1_init	16	static
+../source/BearSSL/src/hash/md5sha1.c:39:1:br_md5sha1_update	56	static
+../source/BearSSL/src/hash/md5sha1.c:68:1:br_md5sha1_out	136	static
+../source/BearSSL/src/hash/md5sha1.c:103:1:br_md5sha1_state	24	static
+../source/BearSSL/src/hash/md5sha1.c:115:1:br_md5sha1_set_state	32	static

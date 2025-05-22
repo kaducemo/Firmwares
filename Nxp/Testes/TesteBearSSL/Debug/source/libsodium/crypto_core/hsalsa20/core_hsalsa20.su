@@ -1,0 +1,4 @@
+../source/libsodium/crypto_core/hsalsa20/core_hsalsa20.c:4:1:crypto_core_hsalsa20_outputbytes	4	static
+../source/libsodium/crypto_core/hsalsa20/core_hsalsa20.c:9:1:crypto_core_hsalsa20_inputbytes	4	static
+../source/libsodium/crypto_core/hsalsa20/core_hsalsa20.c:14:1:crypto_core_hsalsa20_keybytes	4	static
+../source/libsodium/crypto_core/hsalsa20/core_hsalsa20.c:19:1:crypto_core_hsalsa20_constbytes	4	static
