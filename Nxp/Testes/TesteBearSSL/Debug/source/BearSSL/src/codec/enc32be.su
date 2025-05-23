@@ -1,2 +1,2 @@
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
 ../source/BearSSL/src/codec/enc32be.c:29:1:br_range_enc32be	32	static

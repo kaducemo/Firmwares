@@ -1,5 +1,5 @@
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\inc/bearssl_hash.h:1164:1:br_multihash_getimpl	16	static
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:2706:1:br_ssl_client_get_server_curve	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_hash.h:1164:1:br_multihash_getimpl	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:2706:1:br_ssl_client_get_server_curve	16	static
 ../source/BearSSL/src/ssl/ssl_ccert_single_ec.c:28:1:cc_none0	16	static
 ../source/BearSSL/src/ssl/ssl_ccert_single_ec.c:34:1:cc_none1	16	static
 ../source/BearSSL/src/ssl/ssl_ccert_single_ec.c:41:1:cc_none2	24	static

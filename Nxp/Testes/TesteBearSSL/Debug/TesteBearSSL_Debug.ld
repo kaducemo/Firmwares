@@ -6,7 +6,7 @@
  * Generated linker script file for MK64FN1M0xxx12
  * Created from linkscript.ldt by FMCreateLinkLibraries
  * Using Freemarker v2.3.30
- * MCUXpresso IDE v11.7.0 [Build 9198] [2023-01-17] on 21 de mai de 2025 17:36:08
+ * MCUXpresso IDE v11.7.0 [Build 9198] [2023-01-17] on 23 de mai de 2025 09:37:58
  */
 
 INCLUDE "TesteBearSSL_Debug_library.ld"

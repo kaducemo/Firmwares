@@ -1,4 +1,4 @@
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:1593:1:br_digest_size	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1593:1:br_digest_size	16	static
 ../source/BearSSL/src/mac/hmac.c:28:1:block_size	24	static
 ../source/BearSSL/src/mac/hmac.c:38:1:process_key	296	static
 ../source/BearSSL/src/mac/hmac.c:57:1:br_hmac_key_init	312	static

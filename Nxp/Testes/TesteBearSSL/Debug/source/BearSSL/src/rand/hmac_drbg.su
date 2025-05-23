@@ -1,4 +1,4 @@
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:1593:1:br_digest_size	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1593:1:br_digest_size	16	static
 ../source/BearSSL/src/rand/hmac_drbg.c:29:1:br_hmac_drbg_init	32	static
 ../source/BearSSL/src/rand/hmac_drbg.c:44:1:br_hmac_drbg_generate	464	static
 ../source/BearSSL/src/rand/hmac_drbg.c:92:1:br_hmac_drbg_update	456	static

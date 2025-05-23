@@ -1,5 +1,5 @@
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:737:1:NOT	16	static
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:1513:1:br_i15_zero	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:737:1:NOT	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1513:1:br_i15_zero	16	static
 ../source/BearSSL/src/ec/ec_c25519_i15.c:92:1:api_generator	16	static
 ../source/BearSSL/src/ec/ec_c25519_i15.c:100:1:api_order	16	static
 ../source/BearSSL/src/ec/ec_c25519_i15.c:108:1:api_xoff	16	static

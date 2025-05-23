@@ -1,4 +1,4 @@
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:2032:1:br_ssl_engine_last_error	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:2032:1:br_ssl_engine_last_error	16	static
 ../source/BearSSL/src/ssl/ssl_io.c:29:1:br_sslio_init	24	static
 ../source/BearSSL/src/ssl/ssl_io.c:52:1:run_until	48	static
 ../source/BearSSL/src/ssl/ssl_io.c:147:1:br_sslio_read	32	static

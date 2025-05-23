@@ -207,7 +207,87 @@ int main(void) {
 						}
 					}
 
-				} else
+
+					const char *salt_hkdf = "DATAPROM";
+					const char *info = "SECRETCOMM";
+
+					uint8_t key[16] = {0};
+					uint8_t iv[16] = {0};
+
+					uint8_t plain[16] = "Hello, world!\0"; // 16 bytes
+					uint8_t encrypted[16]= {0};
+					uint8_t decrypted[16]= {0};
+
+					PRINTF("--{ HKDF + AES-CBC }--\n\r");
+
+					// Derivação da chave e IV com HKDF - SHA512
+//					br_hkdf_context hkdf;
+//					br_hkdf_init(&hkdf, &br_sha512_vtable, salt_hkdf, strlen(salt_hkdf));
+//					br_hkdf_inject(&hkdf, segredo1, sizeof(segredo1));
+//					br_hkdf_flip(&hkdf);
+//					br_hkdf_produce(&hkdf, info, strlen(info), key, sizeof(key));
+//					br_hkdf_produce(&hkdf, info, strlen(info), iv, sizeof(iv));
+
+					// Derivação da chave e IV com HKDF - SHA256
+					br_hkdf_context hkdf;
+					br_hkdf_init(&hkdf, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
+					br_hkdf_inject(&hkdf, segredo1, sizeof(segredo1));
+					br_hkdf_flip(&hkdf);
+					br_hkdf_produce(&hkdf, info, strlen(info), key, sizeof(key));
+					br_hkdf_produce(&hkdf, info, strlen(info), iv, sizeof(iv));
+
+
+					uint8_t iv_original[16] = {0};
+					memcpy(iv_original, iv, 16); // salva o IV original
+
+
+					PRINTF("Derived Key.....: ");
+//					Dump(key, sizeof(key), DUMP_HEX_STRING);
+					PRINTF("\n\r");
+//
+					PRINTF("Derived IV......: ");
+//					Dump(iv, sizeof(iv), DUMP_HEX_STRING);
+					PRINTF("\n\r");
+
+					// Criptografia AES-CBC (IMPLEMENTAÇÃO BIG - Mais rápido, mas usa mais memoria
+//					br_aes_big_cbcenc_keys ctx_enc;
+//					br_aes_big_cbcenc_init(&ctx_enc, key, sizeof(key));
+//					memcpy(encrypted, plain, 16);
+//					br_aes_big_cbcenc_run(&ctx_enc, iv, encrypted, 16); //Aqui IV será modificado
+
+					// Criptografia AES-CBC (IMPLEMENTAÇÃO SMALL - Lenta, mas usa menos memoria
+					br_aes_small_cbcenc_keys  ctx_enc;
+					br_aes_small_cbcenc_init(&ctx_enc, key, sizeof(key));
+					memcpy(encrypted, plain, 16);
+					br_aes_small_cbcenc_run(&ctx_enc, iv, encrypted, 16); //Aqui IV será modificado
+
+
+					PRINTF("Encrypted.......: ");
+//					Dump(encrypted, 16, DUMP_HEX_STRING);
+					PRINTF("\n\r");
+
+					// Descriptografia AES-CBC - BIG
+//					br_aes_big_cbcdec_keys ctx_dec;
+//					uint8_t iv_dec[16];
+//					memcpy(iv_dec, iv_original, 16); // reset IV
+//					memcpy(decrypted, encrypted, 16);
+//					br_aes_big_cbcdec_init(&ctx_dec, key, sizeof(key));
+//					br_aes_big_cbcdec_run(&ctx_dec, iv_dec, decrypted, 16);
+
+					// Descriptografia AES-CBC - SMALL
+					br_aes_small_cbcdec_keys ctx_dec;
+					uint8_t iv_dec[16];
+					memcpy(iv_dec, iv_original, 16); // reset IV
+					memcpy(decrypted, encrypted, 16);
+					br_aes_small_cbcdec_init(&ctx_dec, key, sizeof(key));
+					br_aes_small_cbcdec_run(&ctx_dec, iv_dec, decrypted, 16);
+
+					PRINTF("Decrypted.......: ");
+//					Dump(decrypted, 16, DUMP_HEX_STRING);
+					PRINTF("\n\r");
+
+				}
+				else
 				{
 					PRINTF("-ERRO!");
 				}

@@ -1,8 +1,8 @@
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\inc/bearssl_rand.h:280:1:br_hmac_drbg_get_hash	16	static
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:478:1:br_enc16be	24	static
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:505:1:br_dec16be	24	static
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_rand.h:280:1:br_hmac_drbg_get_hash	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:478:1:br_enc16be	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:505:1:br_dec16be	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
 ../source/BearSSL/src/ssl/ssl_lru.c:106:1:get_prev	16	static
 ../source/BearSSL/src/ssl/ssl_lru.c:106:1:set_prev	24	static
 ../source/BearSSL/src/ssl/ssl_lru.c:107:1:get_next	16	static
