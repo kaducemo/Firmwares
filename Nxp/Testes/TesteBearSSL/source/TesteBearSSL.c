@@ -215,10 +215,11 @@ int main(void) {
 					uint8_t iv[16] = {0};
 
 					uint8_t plain[16] = "Hello, world!\0"; // 16 bytes
+					PRINTF("Dados antes da Criptografia : %s\n\r", plain);
 					uint8_t encrypted[16]= {0};
 					uint8_t decrypted[16]= {0};
 
-					PRINTF("--{ HKDF + AES-CBC }--\n\r");
+					PRINTF("--{ ECDH + HKDF + AES-CBC }--\n\r");
 
 					// Derivação da chave e IV com HKDF - SHA512
 //					br_hkdf_context hkdf;
@@ -241,13 +242,14 @@ int main(void) {
 					memcpy(iv_original, iv, 16); // salva o IV original
 
 
-					PRINTF("Derived Key.....: ");
-//					Dump(key, sizeof(key), DUMP_HEX_STRING);
-					PRINTF("\n\r");
-//
-					PRINTF("Derived IV......: ");
-//					Dump(iv, sizeof(iv), DUMP_HEX_STRING);
-					PRINTF("\n\r");
+
+					char *strPvKey5 = hex_array_to_string(key, 16);
+					PRINTF("Chave Derivada: %s\n\r", strPvKey5);
+					free(strPvKey5);
+
+					char *strPvKey6 = hex_array_to_string(iv, 16);
+					PRINTF("IV Derivada: %s\n\r", strPvKey6);
+					free(strPvKey6);
 
 					// Criptografia AES-CBC (IMPLEMENTAÇÃO BIG - Mais rápido, mas usa mais memoria
 //					br_aes_big_cbcenc_keys ctx_enc;
@@ -262,9 +264,10 @@ int main(void) {
 					br_aes_small_cbcenc_run(&ctx_enc, iv, encrypted, 16); //Aqui IV será modificado
 
 
-					PRINTF("Encrypted.......: ");
-//					Dump(encrypted, 16, DUMP_HEX_STRING);
-					PRINTF("\n\r");
+					char *strPvKey7 = hex_array_to_string(encrypted, 16);
+					PRINTF("Dado Criptografado: %s\n\r", strPvKey7);
+					free(strPvKey7);
+
 
 					// Descriptografia AES-CBC - BIG
 //					br_aes_big_cbcdec_keys ctx_dec;
@@ -282,9 +285,7 @@ int main(void) {
 					br_aes_small_cbcdec_init(&ctx_dec, key, sizeof(key));
 					br_aes_small_cbcdec_run(&ctx_dec, iv_dec, decrypted, 16);
 
-					PRINTF("Decrypted.......: ");
-//					Dump(decrypted, 16, DUMP_HEX_STRING);
-					PRINTF("\n\r");
+					PRINTF("Dados Descriptografados: %s\n\r", decrypted);
 
 				}
 				else

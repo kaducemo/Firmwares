@@ -1,2 +1,2 @@
-../source/BearSSL/src/rand/sysrng.c:144:1:seeder_libc_rand	56	static
-../source/BearSSL/src/rand/sysrng.c:166:1:br_prng_seeder_system	16	static
+../source/BearSSL/src/rand/sysrng.c:176:1:seeder_mod_rand	64	static
+../source/BearSSL/src/rand/sysrng.c:205:1:br_prng_seeder_system	16	static

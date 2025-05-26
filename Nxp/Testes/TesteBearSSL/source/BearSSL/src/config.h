@@ -31,8 +31,11 @@
 #define BR_USE_URANDOM   0
 #define BR_ARMEL_CORTEXM_GCC   0
 
-/*Criada por mim para obter um numero aleatorio*/
-#define BR_USE_LIBC_RAND   1
+/*Criada por mim para obter um numero PSEUDO Aleatorio via STDLIB*/
+//#define BR_USE_LIBC_RAND   1
+
+/*Criada por mim para obter um numero ALEATORIO via MODULO*/
+#define BR_USE_MODULE_RAND 1
 
 /*
  * This file contains compile-time flags that can override the

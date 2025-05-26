@@ -139,6 +139,7 @@ seeder_win32(const br_prng_class **ctx)
 }
 #endif
 
+
 #if BR_USE_LIBC_RAND
 static int
 seeder_libc_rand(const br_prng_class **ctx)
@@ -158,6 +159,44 @@ seeder_libc_rand(const br_prng_class **ctx)
 
     return 1;
 }
+#endif
+
+#if BR_USE_LFSR_RAND
+static int
+seeder_lfsr(const br_prng_class **ctx)
+{
+	return 0;
+}
+#endif
+
+#if BR_USE_MODULE_RAND
+
+#include "fsl_rnga.h"
+static int
+seeder_mod_rand(const br_prng_class **ctx)
+{
+	uint8_t buffer[32];
+	int rnd = 0;
+	status_t status;
+
+    for (int count = 0; count < 8; ++count) {
+
+    	status = RNGA_GetRandomData(RNG, &rnd, sizeof(rnd));
+		if (status != kStatus_Success)
+		{
+			while(1);
+		}
+        buffer[32 - (4 * count) - 1] = (uint8_t) ((rnd >> 24) & 0xff);
+        buffer[32 - (4 * count) - 2] = (uint8_t) ((rnd >> 16) & 0xff);
+        buffer[32 - (4 * count) - 3] = (uint8_t) ((rnd >>  8) & 0xff);
+        buffer[32 - (4 * count) - 4] = (uint8_t) ((rnd >>  0) & 0xff);
+    }
+
+    (*ctx)->update(ctx, buffer, sizeof(buffer));
+
+    return 1;
+}
+
 #endif
 
 
@@ -186,10 +225,20 @@ br_prng_seeder_system(const char **name)
 
 /*Criada pro mim para obter um numero aleatorio*/
 #elif BR_USE_LIBC_RAND
+
 	if (name != NULL) {
 		*name = "libc_rand";
 	}
 	return &seeder_libc_rand;
+
+#elif BR_USE_MODULE_RAND
+
+	RNGA_Init(RNG);
+
+	if (name != NULL) {
+		*name = "lib_mod_rand";
+	}
+	return &seeder_mod_rand;
 
 #else
 	if (name != NULL) {
