@@ -1,6 +1,0 @@
-../source/BearSSL/src/symcipher/aes_small_dec.c:56:1:add_round_key	24	static
-../source/BearSSL/src/symcipher/aes_small_dec.c:72:1:inv_sub_bytes	24	static
-../source/BearSSL/src/symcipher/aes_small_dec.c:82:1:inv_shift_rows	24	static
-../source/BearSSL/src/symcipher/aes_small_dec.c:107:1:gf256red	24	static
-../source/BearSSL/src/symcipher/aes_small_dec.c:116:1:inv_mix_columns	64	static
-../source/BearSSL/src/symcipher/aes_small_dec.c:153:1:br_aes_small_decrypt	96	static

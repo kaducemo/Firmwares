@@ -1,8 +1,0 @@
-../source/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c:35:1:encode64_uint32	32	static
-../source/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c:51:1:encode64	40	static
-../source/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c:75:1:decode64_one	24	static
-../source/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c:89:1:decode64_uint32	40	static
-../source/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c:110:1:escrypt_parse_setting	32	static
-../source/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c:138:1:escrypt_r	152	static
-../source/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c:203:1:escrypt_gensalt_r	64	static
-../source/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c:244:1:crypto_pwhash_scryptsalsa208sha256_ll	88	static

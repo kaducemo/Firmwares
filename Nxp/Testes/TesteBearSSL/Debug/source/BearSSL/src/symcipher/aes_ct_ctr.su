@@ -1,6 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:518:1:br_enc32le	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:550:1:br_dec32le	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:659:1:br_swap32	16	static
-../source/BearSSL/src/symcipher/aes_ct_ctr.c:29:1:br_aes_ct_ctr_init	24	static
-../source/BearSSL/src/symcipher/aes_ct_ctr.c:37:1:xorbuf	32	static
-../source/BearSSL/src/symcipher/aes_ct_ctr.c:51:1:br_aes_ct_ctr_run	600	static

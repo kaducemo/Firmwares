@@ -1,4 +1,0 @@
-../source/libsodium/crypto_box/curve25519xchacha20poly1305/box_seal_curve25519xchacha20poly1305.c:10:1:_crypto_box_curve25519xchacha20poly1305_seal_nonce	472	static
-../source/libsodium/crypto_box/curve25519xchacha20poly1305/box_seal_curve25519xchacha20poly1305.c:29:1:crypto_box_curve25519xchacha20poly1305_seal	136	static
-../source/libsodium/crypto_box/curve25519xchacha20poly1305/box_seal_curve25519xchacha20poly1305.c:54:1:crypto_box_curve25519xchacha20poly1305_seal_open	72	static
-../source/libsodium/crypto_box/curve25519xchacha20poly1305/box_seal_curve25519xchacha20poly1305.c:76:1:crypto_box_curve25519xchacha20poly1305_sealbytes	4	static

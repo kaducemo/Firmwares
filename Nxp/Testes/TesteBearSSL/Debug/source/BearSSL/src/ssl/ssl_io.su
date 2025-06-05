@@ -1,9 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:2032:1:br_ssl_engine_last_error	16	static
-../source/BearSSL/src/ssl/ssl_io.c:29:1:br_sslio_init	24	static
-../source/BearSSL/src/ssl/ssl_io.c:52:1:run_until	48	static
-../source/BearSSL/src/ssl/ssl_io.c:147:1:br_sslio_read	32	static
-../source/BearSSL/src/ssl/ssl_io.c:169:1:br_sslio_read_all	32	static
-../source/BearSSL/src/ssl/ssl_io.c:189:1:br_sslio_write	32	static
-../source/BearSSL/src/ssl/ssl_io.c:211:1:br_sslio_write_all	32	static
-../source/BearSSL/src/ssl/ssl_io.c:231:1:br_sslio_flush	16	static
-../source/BearSSL/src/ssl/ssl_io.c:246:1:br_sslio_close	24	static

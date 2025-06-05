@@ -1,1 +1,0 @@
-../source/BearSSL/src/symcipher/chacha20_sse2.c:232:1:br_chacha20_sse2_get	4	static

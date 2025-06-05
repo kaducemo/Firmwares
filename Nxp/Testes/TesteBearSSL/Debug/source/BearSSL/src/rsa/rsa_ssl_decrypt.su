@@ -1,4 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:737:1:NOT	16	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:755:1:EQ	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:767:1:NEQ	24	static
-../source/BearSSL/src/rsa/rsa_ssl_decrypt.c:29:1:br_rsa_ssl_decrypt	32	static

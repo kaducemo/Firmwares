@@ -1,2 +1,0 @@
-../source/libsodium/crypto_stream/salsa2012/ref/stream_salsa2012_ref.c:14:1:crypto_stream_salsa2012	152	static
-../source/libsodium/crypto_stream/salsa2012/ref/stream_salsa2012_ref.c:59:1:crypto_stream_salsa2012_xor	152	static

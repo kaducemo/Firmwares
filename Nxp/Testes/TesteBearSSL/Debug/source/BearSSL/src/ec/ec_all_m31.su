@@ -1,6 +1,0 @@
-../source/BearSSL/src/ec/ec_all_m31.c:28:1:api_generator	16	static
-../source/BearSSL/src/ec/ec_all_m31.c:41:1:api_order	16	static
-../source/BearSSL/src/ec/ec_all_m31.c:54:1:api_xoff	16	static
-../source/BearSSL/src/ec/ec_all_m31.c:67:1:api_mul	40	static
-../source/BearSSL/src/ec/ec_all_m31.c:81:1:api_mulgen	32	static
-../source/BearSSL/src/ec/ec_all_m31.c:95:1:api_muladd	48	static

@@ -1,5 +1,0 @@
-../source/BearSSL/src/symcipher/aes_small_enc.c:30:1:add_round_key	24	static
-../source/BearSSL/src/symcipher/aes_small_enc.c:46:1:sub_bytes	24	static
-../source/BearSSL/src/symcipher/aes_small_enc.c:56:1:shift_rows	24	static
-../source/BearSSL/src/symcipher/aes_small_enc.c:81:1:mix_columns	56	static
-../source/BearSSL/src/symcipher/aes_small_enc.c:106:1:br_aes_small_encrypt	96	static

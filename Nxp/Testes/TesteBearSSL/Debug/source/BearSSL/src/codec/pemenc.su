@@ -1,2 +1,0 @@
-../source/BearSSL/src/codec/pemenc.c:32:1:b64char	32	static
-../source/BearSSL/src/codec/pemenc.c:65:1:br_pem_encode	72	static

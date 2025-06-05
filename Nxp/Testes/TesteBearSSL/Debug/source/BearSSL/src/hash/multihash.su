@@ -1,5 +1,0 @@
-../source/BearSSL/src/hash/multihash.c:47:1:get_state_offset	24	static
-../source/BearSSL/src/hash/multihash.c:74:1:br_multihash_zero	16	static
-../source/BearSSL/src/hash/multihash.c:85:1:br_multihash_init	240	static
-../source/BearSSL/src/hash/multihash.c:106:1:br_multihash_update	288	static
-../source/BearSSL/src/hash/multihash.c:151:1:br_multihash_out	256	static

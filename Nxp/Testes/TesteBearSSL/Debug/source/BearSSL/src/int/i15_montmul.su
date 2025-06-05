@@ -1,4 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:737:1:NOT	16	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:767:1:NEQ	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1513:1:br_i15_zero	16	static
-../source/BearSSL/src/int/i15_montmul.c:29:1:br_i15_montymul	80	static

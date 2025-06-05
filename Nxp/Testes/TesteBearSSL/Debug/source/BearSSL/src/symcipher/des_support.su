@@ -1,5 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
-../source/BearSSL/src/symcipher/des_support.c:29:1:br_des_do_IP	32	static
-../source/BearSSL/src/symcipher/des_support.c:61:1:br_des_do_invIP	32	static
-../source/BearSSL/src/symcipher/des_support.c:91:1:br_des_keysched_unit	40	static
-../source/BearSSL/src/symcipher/des_support.c:152:1:br_des_rev_skey	24	static

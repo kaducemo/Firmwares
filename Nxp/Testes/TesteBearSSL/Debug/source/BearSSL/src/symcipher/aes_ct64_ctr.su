@@ -1,4 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:659:1:br_swap32	16	static
-../source/BearSSL/src/symcipher/aes_ct64_ctr.c:29:1:br_aes_ct64_ctr_init	24	static
-../source/BearSSL/src/symcipher/aes_ct64_ctr.c:37:1:xorbuf	32	static
-../source/BearSSL/src/symcipher/aes_ct64_ctr.c:51:1:br_aes_ct64_ctr_run	1264	static

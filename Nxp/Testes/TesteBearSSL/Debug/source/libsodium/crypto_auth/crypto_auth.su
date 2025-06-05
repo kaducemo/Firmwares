@@ -1,6 +1,0 @@
-../source/libsodium/crypto_auth/crypto_auth.c:6:1:crypto_auth_bytes	4	static
-../source/libsodium/crypto_auth/crypto_auth.c:12:1:crypto_auth_keybytes	4	static
-../source/libsodium/crypto_auth/crypto_auth.c:18:1:crypto_auth_primitive	4	static
-../source/libsodium/crypto_auth/crypto_auth.c:24:1:crypto_auth	32	static
-../source/libsodium/crypto_auth/crypto_auth.c:31:1:crypto_auth_verify	32	static
-../source/libsodium/crypto_auth/crypto_auth.c:38:1:crypto_auth_keygen	16	static

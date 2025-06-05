@@ -1,4 +1,0 @@
-../source/libsodium/sodium/version.c:5:1:sodium_version_string	4	static
-../source/libsodium/sodium/version.c:11:1:sodium_library_version_major	4	static
-../source/libsodium/sodium/version.c:17:1:sodium_library_version_minor	4	static
-../source/libsodium/sodium/version.c:23:1:sodium_library_minimal	4	static

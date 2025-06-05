@@ -1,2 +1,0 @@
-../source/libsodium/crypto_stream/salsa20/ref/salsa20_ref.c:19:1:stream_ref	152	static
-../source/libsodium/crypto_stream/salsa20/ref/salsa20_ref.c:64:1:stream_ref_xor_ic	152	static

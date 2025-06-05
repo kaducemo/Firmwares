@@ -1,4 +1,0 @@
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:51:1:rotl64	48	static
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:74:1:load64_le	152	static
-C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:95:1:store64_le	24	static
-../source/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphash24_ref.c:6:1:crypto_shorthash_siphash24	824	static

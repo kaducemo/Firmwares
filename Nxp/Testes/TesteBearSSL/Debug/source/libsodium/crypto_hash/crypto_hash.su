@@ -1,3 +1,0 @@
-../source/libsodium/crypto_hash/crypto_hash.c:5:1:crypto_hash_bytes	4	static
-../source/libsodium/crypto_hash/crypto_hash.c:11:1:crypto_hash	24	static
-../source/libsodium/crypto_hash/crypto_hash.c:18:1:crypto_hash_primitive	4	static

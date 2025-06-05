@@ -1,5 +1,0 @@
-../source/libsodium/sodium/core.c:28:1:sodium_init	8	static
-../source/libsodium/sodium/core.c:173:1:sodium_crit_enter	4	static
-../source/libsodium/sodium/core.c:179:1:sodium_crit_leave	4	static
-../source/libsodium/sodium/core.c:189:1:sodium_misuse	16	static
-../source/libsodium/sodium/core.c:206:1:sodium_set_misuse_handler	16	static

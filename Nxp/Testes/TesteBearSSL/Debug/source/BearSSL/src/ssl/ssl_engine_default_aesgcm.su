@@ -1,4 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1467:1:br_ssl_engine_set_aes_ctr	16	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1520:1:br_ssl_engine_set_ghash	16	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1612:1:br_ssl_engine_set_gcm	24	static
-../source/BearSSL/src/ssl/ssl_engine_default_aesgcm.c:29:1:br_ssl_engine_set_default_aes_gcm	16	static

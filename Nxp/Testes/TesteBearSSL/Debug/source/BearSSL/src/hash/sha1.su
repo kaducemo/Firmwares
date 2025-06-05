@@ -1,8 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:596:1:br_enc64be	32	static
-../source/BearSSL/src/hash/sha1.c:46:1:br_sha1_round	368	static
-../source/BearSSL/src/hash/sha1.c:101:1:br_sha1_init	16	static
-../source/BearSSL/src/hash/sha1.c:110:1:br_sha1_update	56	static
-../source/BearSSL/src/hash/sha1.c:138:1:br_sha1_out	112	static
-../source/BearSSL/src/hash/sha1.c:162:1:br_sha1_state	16	static
-../source/BearSSL/src/hash/sha1.c:170:1:br_sha1_set_state	24	static

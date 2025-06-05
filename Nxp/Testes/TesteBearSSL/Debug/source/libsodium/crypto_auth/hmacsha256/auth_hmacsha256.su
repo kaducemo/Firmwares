@@ -1,9 +1,0 @@
-../source/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c:13:1:crypto_auth_hmacsha256_bytes	4	static
-../source/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c:19:1:crypto_auth_hmacsha256_keybytes	4	static
-../source/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c:25:1:crypto_auth_hmacsha256_statebytes	4	static
-../source/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c:31:1:crypto_auth_hmacsha256_keygen	16	static
-../source/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c:37:1:crypto_auth_hmacsha256_init	136	static
-../source/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c:72:1:crypto_auth_hmacsha256_update	24	static
-../source/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c:81:1:crypto_auth_hmacsha256_final	48	static
-../source/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c:96:1:crypto_auth_hmacsha256	232	static
-../source/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c:109:1:crypto_auth_hmacsha256_verify	72	static

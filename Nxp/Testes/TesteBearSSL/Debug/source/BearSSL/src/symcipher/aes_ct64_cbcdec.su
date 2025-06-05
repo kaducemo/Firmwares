@@ -1,2 +1,0 @@
-../source/BearSSL/src/symcipher/aes_ct64_cbcdec.c:29:1:br_aes_ct64_cbcdec_init	24	static
-../source/BearSSL/src/symcipher/aes_ct64_cbcdec.c:38:1:br_aes_ct64_cbcdec_run	1224	static

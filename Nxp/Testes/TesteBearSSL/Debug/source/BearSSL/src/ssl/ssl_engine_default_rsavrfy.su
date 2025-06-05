@@ -1,2 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1703:1:br_ssl_engine_set_rsavrfy	16	static
-../source/BearSSL/src/ssl/ssl_engine_default_rsavrfy.c:29:1:br_ssl_engine_set_default_rsavrfy	16	static

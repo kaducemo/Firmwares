@@ -1,4 +1,0 @@
-../source/libsodium/crypto_stream/salsa2012/stream_salsa2012.c:5:1:crypto_stream_salsa2012_keybytes	4	static
-../source/libsodium/crypto_stream/salsa2012/stream_salsa2012.c:11:1:crypto_stream_salsa2012_noncebytes	4	static
-../source/libsodium/crypto_stream/salsa2012/stream_salsa2012.c:17:1:crypto_stream_salsa2012_messagebytes_max	4	static
-../source/libsodium/crypto_stream/salsa2012/stream_salsa2012.c:23:1:crypto_stream_salsa2012_keygen	16	static

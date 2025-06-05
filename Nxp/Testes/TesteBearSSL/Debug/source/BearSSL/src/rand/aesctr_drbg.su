@@ -1,4 +1,0 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
-../source/BearSSL/src/rand/aesctr_drbg.c:29:1:br_aesctr_drbg_init	40	static
-../source/BearSSL/src/rand/aesctr_drbg.c:44:1:br_aesctr_drbg_generate	64	static
-../source/BearSSL/src/rand/aesctr_drbg.c:96:1:br_aesctr_drbg_update	160	static

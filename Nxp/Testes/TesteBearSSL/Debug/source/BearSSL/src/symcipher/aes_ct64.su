@@ -1,7 +1,0 @@
-../source/BearSSL/src/symcipher/aes_ct64.c:29:1:br_aes_ct64_bitslice_Sbox	1952	static
-../source/BearSSL/src/symcipher/aes_ct64.c:206:1:br_aes_ct64_ortho	816	static
-../source/BearSSL/src/symcipher/aes_ct64.c:238:1:br_aes_ct64_interleave_in	264	static
-../source/BearSSL/src/symcipher/aes_ct64.c:268:1:br_aes_ct64_interleave_out	152	static
-../source/BearSSL/src/symcipher/aes_ct64.c:295:1:sub_word	88	static
-../source/BearSSL/src/symcipher/aes_ct64.c:309:1:br_aes_ct64_keysched	472	static
-../source/BearSSL/src/symcipher/aes_ct64.c:376:1:br_aes_ct64_skey_expand	136	static

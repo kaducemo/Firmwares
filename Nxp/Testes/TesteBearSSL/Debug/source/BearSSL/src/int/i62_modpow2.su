@@ -1,2 +1,0 @@
-../source/BearSSL/src/int/i62_modpow2.c:466:1:br_i62_modpow_opt	48	static
-../source/BearSSL/src/int/i62_modpow2.c:483:1:br_i62_modpow_opt_as_i31	40	static

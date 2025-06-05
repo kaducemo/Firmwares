@@ -1,9 +1,0 @@
-../source/libsodium/crypto_kx/crypto_kx.c:13:1:crypto_kx_seed_keypair	40	static
-../source/libsodium/crypto_kx/crypto_kx.c:23:1:crypto_kx_keypair	16	static
-../source/libsodium/crypto_kx/crypto_kx.c:34:1:crypto_kx_client_session_keys	576	static
-../source/libsodium/crypto_kx/crypto_kx.c:75:1:crypto_kx_server_session_keys	576	static
-../source/libsodium/crypto_kx/crypto_kx.c:116:1:crypto_kx_publickeybytes	4	static
-../source/libsodium/crypto_kx/crypto_kx.c:122:1:crypto_kx_secretkeybytes	4	static
-../source/libsodium/crypto_kx/crypto_kx.c:128:1:crypto_kx_seedbytes	4	static
-../source/libsodium/crypto_kx/crypto_kx.c:134:1:crypto_kx_sessionkeybytes	4	static
-../source/libsodium/crypto_kx/crypto_kx.c:140:1:crypto_kx_primitive	4	static

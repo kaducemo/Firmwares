@@ -1,5 +1,0 @@
-../source/BearSSL/src/symcipher/aes_ct_enc.c:28:1:add_round_key	16	static
-../source/BearSSL/src/symcipher/aes_ct_enc.c:41:1:shift_rows	24	static
-../source/BearSSL/src/symcipher/aes_ct_enc.c:57:1:rotr16	16	static
-../source/BearSSL/src/symcipher/aes_ct_enc.c:63:1:mix_columns	88	static
-../source/BearSSL/src/symcipher/aes_ct_enc.c:97:1:br_aes_ct_bitslice_encrypt	32	static

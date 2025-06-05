@@ -1,2 +1,0 @@
-../source/BearSSL/src/ec/ecdsa_rta.c:35:1:asn1_int_length	16	static
-../source/BearSSL/src/ec/ecdsa_rta.c:49:1:br_ecdsa_raw_to_asn1	304	static
