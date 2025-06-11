@@ -1,0 +1,1 @@
+../source/BearSSL/src/ssl/prf_sha256.c:29:1:br_tls12_sha256_prf	40	static

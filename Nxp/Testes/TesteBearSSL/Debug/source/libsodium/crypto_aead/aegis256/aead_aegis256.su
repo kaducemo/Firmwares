@@ -1,0 +1,11 @@
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:25:1:crypto_aead_aegis256_keybytes	4	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:31:1:crypto_aead_aegis256_nsecbytes	4	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:37:1:crypto_aead_aegis256_npubbytes	4	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:43:1:crypto_aead_aegis256_abytes	4	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:49:1:crypto_aead_aegis256_messagebytes_max	4	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:55:1:crypto_aead_aegis256_keygen	16	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:61:1:crypto_aead_aegis256_encrypt	88	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:81:1:crypto_aead_aegis256_decrypt	88	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:104:1:crypto_aead_aegis256_encrypt_detached	64	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:124:1:crypto_aead_aegis256_decrypt_detached	64	static
+../source/libsodium/crypto_aead/aegis256/aead_aegis256.c:140:1:_crypto_aead_aegis256_pick_best_implementation	4	static

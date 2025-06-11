@@ -1,0 +1,7 @@
+../source/libsodium/crypto_stream/xchacha20/stream_xchacha20.c:11:1:crypto_stream_xchacha20_keybytes	4	static
+../source/libsodium/crypto_stream/xchacha20/stream_xchacha20.c:17:1:crypto_stream_xchacha20_noncebytes	4	static
+../source/libsodium/crypto_stream/xchacha20/stream_xchacha20.c:23:1:crypto_stream_xchacha20_messagebytes_max	4	static
+../source/libsodium/crypto_stream/xchacha20/stream_xchacha20.c:29:1:crypto_stream_xchacha20	64	static
+../source/libsodium/crypto_stream/xchacha20/stream_xchacha20.c:45:1:crypto_stream_xchacha20_xor_ic	80	static
+../source/libsodium/crypto_stream/xchacha20/stream_xchacha20.c:57:1:crypto_stream_xchacha20_xor	48	static
+../source/libsodium/crypto_stream/xchacha20/stream_xchacha20.c:65:1:crypto_stream_xchacha20_keygen	16	static

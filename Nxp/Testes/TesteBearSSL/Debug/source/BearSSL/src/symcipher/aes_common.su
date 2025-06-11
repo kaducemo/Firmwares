@@ -1,0 +1,3 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
+../source/BearSSL/src/symcipher/aes_common.c:61:1:SubWord	16	static
+../source/BearSSL/src/symcipher/aes_common.c:71:1:br_aes_keysched	64	static

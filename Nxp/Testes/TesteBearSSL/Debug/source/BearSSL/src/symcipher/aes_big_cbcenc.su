@@ -1,0 +1,2 @@
+../source/BearSSL/src/symcipher/aes_big_cbcenc.c:29:1:br_aes_big_cbcenc_init	24	static
+../source/BearSSL/src/symcipher/aes_big_cbcenc.c:38:1:br_aes_big_cbcenc_run	40	static

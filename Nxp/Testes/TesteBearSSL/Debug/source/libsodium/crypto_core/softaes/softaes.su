@@ -1,0 +1,3 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:44:1:rotl32	16	static
+../source/libsodium/crypto_core/softaes/softaes.c:251:1:_encrypt	1200	static
+../source/libsodium/crypto_core/softaes/softaes.c:302:1:softaes_block_encrypt	368	static

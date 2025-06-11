@@ -1,0 +1,6 @@
+../source/BearSSL/src/symcipher/aes_ct64_dec.c:29:1:br_aes_ct64_bitslice_invSbox	400	static
+../source/BearSSL/src/symcipher/aes_ct64_dec.c:75:1:add_round_key	32	static
+../source/BearSSL/src/symcipher/aes_ct64_dec.c:85:1:inv_shift_rows	144	static
+../source/BearSSL/src/symcipher/aes_ct64_dec.c:104:1:rotr32	16	static
+../source/BearSSL/src/symcipher/aes_ct64_dec.c:110:1:inv_mix_columns	1088	static
+../source/BearSSL/src/symcipher/aes_ct64_dec.c:144:1:br_aes_ct64_bitslice_decrypt	32	static

@@ -1,0 +1,17 @@
+../source/BearSSL/src/ec/ec_c25519_m31.c:95:1:le8_to_le30	40	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:124:1:le30_to_le8	40	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:153:1:mul9	2648	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:271:1:square9	1608	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:345:1:reduce_final_f255	64	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:373:1:f255_mul	240	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:416:1:f255_square	232	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:457:1:f255_add	40	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:486:1:f255_sub	40	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:515:1:f255_mul_a24	136	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:550:1:api_generator	16	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:558:1:api_order	16	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:566:1:api_xoff	16	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:574:1:cswap	40	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:591:1:api_mul	584	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:727:1:api_mulgen	40	static
+../source/BearSSL/src/ec/ec_c25519_m31.c:740:1:api_muladd	24	static

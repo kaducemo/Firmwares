@@ -1,0 +1,17 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:113:1:load32_le	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:130:1:store32_le	16	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/softaes.h:18:1:softaes_block_load	40	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/softaes.h:26:1:softaes_block_load64x2	40	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/softaes.h:34:1:softaes_block_store	16	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/softaes.h:43:1:softaes_block_xor	32	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/softaes.h:50:1:softaes_block_and	32	static
+../source/libsodium/crypto_aead/aegis256/aegis256_soft.c:34:1:aegis256_update	104	static
+../source/libsodium/crypto_aead/aegis256/aegis256_common.h:4:1:aegis256_init	216	static
+../source/libsodium/crypto_aead/aegis256/aegis256_common.h:38:1:aegis256_mac	168	static
+../source/libsodium/crypto_aead/aegis256/aegis256_common.h:66:1:aegis256_absorb	40	static
+../source/libsodium/crypto_aead/aegis256/aegis256_common.h:75:1:aegis256_absorb2	56	static
+../source/libsodium/crypto_aead/aegis256/aegis256_common.h:86:1:aegis256_enc	128	static
+../source/libsodium/crypto_aead/aegis256/aegis256_common.h:102:1:aegis256_dec	112	static
+../source/libsodium/crypto_aead/aegis256/aegis256_common.h:117:1:aegis256_declast	128	static
+../source/libsodium/crypto_aead/aegis256/aegis256_common.h:141:1:encrypt_detached	208	static
+../source/libsodium/crypto_aead/aegis256/aegis256_common.h:178:1:decrypt_detached	248	static

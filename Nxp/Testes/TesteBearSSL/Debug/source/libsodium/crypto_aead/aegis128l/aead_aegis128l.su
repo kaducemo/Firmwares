@@ -1,0 +1,11 @@
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:25:1:crypto_aead_aegis128l_keybytes	4	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:31:1:crypto_aead_aegis128l_nsecbytes	4	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:37:1:crypto_aead_aegis128l_npubbytes	4	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:43:1:crypto_aead_aegis128l_abytes	4	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:49:1:crypto_aead_aegis128l_messagebytes_max	4	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:55:1:crypto_aead_aegis128l_keygen	16	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:61:1:crypto_aead_aegis128l_encrypt	88	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:81:1:crypto_aead_aegis128l_decrypt	88	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:104:1:crypto_aead_aegis128l_encrypt_detached	64	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:124:1:crypto_aead_aegis128l_decrypt_detached	64	static
+../source/libsodium/crypto_aead/aegis128l/aead_aegis128l.c:141:1:_crypto_aead_aegis128l_pick_best_implementation	4	static

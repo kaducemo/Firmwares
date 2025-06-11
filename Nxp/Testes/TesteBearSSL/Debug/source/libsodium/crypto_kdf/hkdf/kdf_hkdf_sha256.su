@@ -1,0 +1,10 @@
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:11:1:crypto_kdf_hkdf_sha256_extract_init	24	static
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:18:1:crypto_kdf_hkdf_sha256_extract_update	32	static
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:25:1:crypto_kdf_hkdf_sha256_extract_final	16	static
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:35:1:crypto_kdf_hkdf_sha256_extract	232	static
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:49:1:crypto_kdf_hkdf_sha256_keygen	16	static
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:55:1:crypto_kdf_hkdf_sha256_expand	304	static
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:103:1:crypto_kdf_hkdf_sha256_keybytes	4	static
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:109:1:crypto_kdf_hkdf_sha256_bytes_min	4	static
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:115:1:crypto_kdf_hkdf_sha256_bytes_max	4	static
+../source/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c:120:8:crypto_kdf_hkdf_sha256_statebytes	4	static

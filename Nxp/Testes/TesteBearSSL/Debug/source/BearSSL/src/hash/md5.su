@@ -1,0 +1,8 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:518:1:br_enc32le	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:582:1:br_enc64le	40	static
+../source/BearSSL/src/hash/md5.c:69:1:br_md5_round	104	static
+../source/BearSSL/src/hash/md5.c:119:1:br_md5_init	16	static
+../source/BearSSL/src/hash/md5.c:128:1:br_md5_update	56	static
+../source/BearSSL/src/hash/md5.c:156:1:br_md5_out	112	static
+../source/BearSSL/src/hash/md5.c:180:1:br_md5_state	16	static
+../source/BearSSL/src/hash/md5.c:188:1:br_md5_set_state	24	static

@@ -1,0 +1,17 @@
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:9:1:crypto_aead_aes256gcm_keybytes	4	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:15:1:crypto_aead_aes256gcm_nsecbytes	4	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:21:1:crypto_aead_aes256gcm_npubbytes	4	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:27:1:crypto_aead_aes256gcm_abytes	4	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:33:1:crypto_aead_aes256gcm_statebytes	4	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:39:1:crypto_aead_aes256gcm_messagebytes_max	4	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:45:1:crypto_aead_aes256gcm_keygen	16	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:58:1:crypto_aead_aes256gcm_encrypt_detached	24	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:69:1:crypto_aead_aes256gcm_encrypt	24	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:79:1:crypto_aead_aes256gcm_decrypt_detached	24	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:90:1:crypto_aead_aes256gcm_decrypt	24	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:100:1:crypto_aead_aes256gcm_beforenm	16	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:107:1:crypto_aead_aes256gcm_encrypt_detached_afternm	24	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:119:1:crypto_aead_aes256gcm_encrypt_afternm	24	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:130:1:crypto_aead_aes256gcm_decrypt_detached_afternm	24	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:141:1:crypto_aead_aes256gcm_decrypt_afternm	24	static
+../source/libsodium/crypto_aead/aes256gcm/aead_aes256gcm.c:152:1:crypto_aead_aes256gcm_is_available	4	static

@@ -1,0 +1,3 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:65:1:rotr64	48	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:74:1:load64_le	152	static
+../source/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ref.c:31:1:blake2b_compress_ref	8016	static

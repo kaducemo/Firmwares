@@ -1,0 +1,10 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:478:1:br_enc16be	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:596:1:br_enc64be	32	static
+../source/BearSSL/src/ssl/ssl_rec_ccm.c:33:1:gen_ccm_init	24	static
+../source/BearSSL/src/ssl/ssl_rec_ccm.c:45:1:in_ccm_init	32	static
+../source/BearSSL/src/ssl/ssl_rec_ccm.c:55:1:ccm_check_length	24	static
+../source/BearSSL/src/ssl/ssl_rec_ccm.c:68:1:ccm_decrypt	176	static
+../source/BearSSL/src/ssl/ssl_rec_ccm.c:125:1:out_ccm_init	32	static
+../source/BearSSL/src/ssl/ssl_rec_ccm.c:135:1:ccm_max_plaintext	32	static
+../source/BearSSL/src/ssl/ssl_rec_ccm.c:149:1:ccm_encrypt	176	static

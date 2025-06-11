@@ -1,0 +1,1 @@
+../source/BearSSL/src/symcipher/aes_x86ni_cbcdec.c:218:1:br_aes_x86ni_cbcdec_get_vtable	4	static

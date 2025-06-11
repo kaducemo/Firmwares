@@ -1,0 +1,2 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:518:1:br_enc32le	24	static
+../source/BearSSL/src/codec/enc32le.c:29:1:br_range_enc32le	32	static

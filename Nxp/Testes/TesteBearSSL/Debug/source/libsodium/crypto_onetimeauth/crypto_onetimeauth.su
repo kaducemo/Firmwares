@@ -1,0 +1,10 @@
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:6:1:crypto_onetimeauth_statebytes	4	static
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:12:1:crypto_onetimeauth_bytes	4	static
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:18:1:crypto_onetimeauth_keybytes	4	static
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:24:1:crypto_onetimeauth	32	static
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:31:1:crypto_onetimeauth_verify	32	static
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:38:1:crypto_onetimeauth_init	16	static
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:46:1:crypto_onetimeauth_update	24	static
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:55:1:crypto_onetimeauth_final	16	static
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:63:1:crypto_onetimeauth_primitive	4	static
+../source/libsodium/crypto_onetimeauth/crypto_onetimeauth.c:68:6:crypto_onetimeauth_keygen	16	static

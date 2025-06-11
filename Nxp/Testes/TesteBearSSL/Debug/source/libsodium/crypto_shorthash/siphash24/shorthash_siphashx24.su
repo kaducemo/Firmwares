@@ -1,0 +1,2 @@
+../source/libsodium/crypto_shorthash/siphash24/shorthash_siphashx24.c:4:1:crypto_shorthash_siphashx24_bytes	4	static
+../source/libsodium/crypto_shorthash/siphash24/shorthash_siphashx24.c:9:1:crypto_shorthash_siphashx24_keybytes	4	static

@@ -1,0 +1,4 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1532:1:br_ssl_engine_set_chacha20	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1545:1:br_ssl_engine_set_poly1305	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1645:1:br_ssl_engine_set_chapol	24	static
+../source/BearSSL/src/ssl/ssl_engine_default_chapol.c:29:1:br_ssl_engine_set_default_chapol	16	static

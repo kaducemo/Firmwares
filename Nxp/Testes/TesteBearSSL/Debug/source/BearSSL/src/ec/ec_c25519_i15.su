@@ -1,0 +1,13 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:737:1:NOT	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1513:1:br_i15_zero	16	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:92:1:api_generator	16	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:100:1:api_order	16	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:108:1:api_xoff	16	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:116:1:cswap	40	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:133:1:c255_add	64	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:146:1:c255_sub	64	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:156:1:c255_mul	72	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:165:1:byteswap	24	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:179:1:api_mul	600	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:356:1:api_mulgen	40	static
+../source/BearSSL/src/ec/ec_c25519_i15.c:369:1:api_muladd	24	static

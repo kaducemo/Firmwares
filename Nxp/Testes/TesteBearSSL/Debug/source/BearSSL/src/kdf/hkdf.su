@@ -1,0 +1,7 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_hmac.h:155:1:br_hmac_size	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_hmac.h:169:36:br_hmac_get_digest	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1593:1:br_digest_size	16	static
+../source/BearSSL/src/kdf/hkdf.c:31:1:br_hkdf_init	224	static
+../source/BearSSL/src/kdf/hkdf.c:49:1:br_hkdf_inject	24	static
+../source/BearSSL/src/kdf/hkdf.c:56:1:br_hkdf_flip	88	static
+../source/BearSSL/src/kdf/hkdf.c:69:1:br_hkdf_produce	328	static

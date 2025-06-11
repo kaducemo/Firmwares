@@ -1,0 +1,14 @@
+../source/BearSSL/src/ssl/ssl_hs_server.c:13:1:t0_parse7E_unsigned	24	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:30:1:t0_parse7E_signed	32	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_hash.h:1164:1:br_multihash_getimpl	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:478:1:br_enc16be	24	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:98:1:do_rsa_decrypt	80	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:142:1:ecdh_common	104	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:176:1:do_ecdh	40	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:196:1:do_static_ecdh	168	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:219:1:hash_data	288	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:264:1:do_ecdhe_part1	64	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:333:1:do_ecdhe_part2	56	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:405:1:verify_CV_sig	120	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:951:1:br_ssl_hs_server_init_main	40	static
+../source/BearSSL/src/ssl/ssl_hs_server.c:956:1:br_ssl_hs_server_run	664	static

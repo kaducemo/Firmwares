@@ -1,0 +1,8 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:737:1:NOT	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:779:1:GT	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:820:1:EQ0	24	static
+../source/BearSSL/src/int/i15_moddiv.c:43:1:cond_negate	40	static
+../source/BearSSL/src/int/i15_moddiv.c:71:1:finish_mod	56	static
+../source/BearSSL/src/int/i15_moddiv.c:123:1:co_reduce	64	static
+../source/BearSSL/src/int/i15_moddiv.c:183:1:co_reduce_mod	72	static
+../source/BearSSL/src/int/i15_moddiv.c:244:1:br_i15_moddiv	184	static

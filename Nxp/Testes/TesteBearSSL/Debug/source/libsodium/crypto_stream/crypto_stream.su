@@ -1,0 +1,7 @@
+../source/libsodium/crypto_stream/crypto_stream.c:6:1:crypto_stream_keybytes	4	static
+../source/libsodium/crypto_stream/crypto_stream.c:12:1:crypto_stream_noncebytes	4	static
+../source/libsodium/crypto_stream/crypto_stream.c:18:1:crypto_stream_messagebytes_max	4	static
+../source/libsodium/crypto_stream/crypto_stream.c:24:1:crypto_stream_primitive	4	static
+../source/libsodium/crypto_stream/crypto_stream.c:30:1:crypto_stream	32	static
+../source/libsodium/crypto_stream/crypto_stream.c:38:1:crypto_stream_xor	32	static
+../source/libsodium/crypto_stream/crypto_stream.c:46:1:crypto_stream_keygen	16	static

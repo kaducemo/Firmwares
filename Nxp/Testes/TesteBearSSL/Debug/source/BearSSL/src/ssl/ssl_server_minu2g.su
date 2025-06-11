@@ -1,0 +1,5 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_hash.h:1142:1:br_multihash_setimpl	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1250:1:br_ssl_engine_set_versions	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1365:1:br_ssl_engine_set_hash	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1412:1:br_ssl_engine_set_prf_sha256	16	static
+../source/BearSSL/src/ssl/ssl_server_minu2g.c:29:1:br_ssl_server_init_minu2g	40	static

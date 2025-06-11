@@ -1,0 +1,16 @@
+../source/libsodium/sodium/runtime.c:58:1:_sodium_runtime_arm_cpu_features	16	static
+../source/libsodium/sodium/runtime.c:151:1:_cpuid	16	static
+../source/libsodium/sodium/runtime.c:193:1:_sodium_runtime_intel_cpu_features	40	static
+../source/libsodium/sodium/runtime.c:310:1:_sodium_runtime_get_cpu_features	16	static
+../source/libsodium/sodium/runtime.c:322:1:sodium_runtime_has_neon	4	static
+../source/libsodium/sodium/runtime.c:328:1:sodium_runtime_has_armcrypto	4	static
+../source/libsodium/sodium/runtime.c:334:1:sodium_runtime_has_sse2	4	static
+../source/libsodium/sodium/runtime.c:340:1:sodium_runtime_has_sse3	4	static
+../source/libsodium/sodium/runtime.c:346:1:sodium_runtime_has_ssse3	4	static
+../source/libsodium/sodium/runtime.c:352:1:sodium_runtime_has_sse41	4	static
+../source/libsodium/sodium/runtime.c:358:1:sodium_runtime_has_avx	4	static
+../source/libsodium/sodium/runtime.c:364:1:sodium_runtime_has_avx2	4	static
+../source/libsodium/sodium/runtime.c:370:1:sodium_runtime_has_avx512f	4	static
+../source/libsodium/sodium/runtime.c:376:1:sodium_runtime_has_pclmul	4	static
+../source/libsodium/sodium/runtime.c:382:1:sodium_runtime_has_aesni	4	static
+../source/libsodium/sodium/runtime.c:388:1:sodium_runtime_has_rdrand	4	static

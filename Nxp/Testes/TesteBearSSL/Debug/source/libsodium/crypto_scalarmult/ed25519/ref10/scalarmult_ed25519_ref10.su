@@ -1,0 +1,16 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:79:1:fe25519_sub	64	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:148:1:fe25519_cmov	112	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:198:1:fe25519_cswap	152	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:348:1:fe25519_mul	4552	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:618:1:fe25519_sq	2704	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/ed25519_ref10_fe_25_5.h:790:1:fe25519_sq2	2784	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:9:1:_crypto_scalarmult_ed25519_is_inf	24	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:24:1:_crypto_scalarmult_ed25519_clamp	16	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:31:1:_crypto_scalarmult_ed25519	360	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:60:1:crypto_scalarmult_ed25519	24	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:67:1:crypto_scalarmult_ed25519_noclamp	24	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:74:1:_crypto_scalarmult_ed25519_base	192	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:98:1:crypto_scalarmult_ed25519_base	16	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:105:1:crypto_scalarmult_ed25519_base_noclamp	16	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:112:1:crypto_scalarmult_ed25519_bytes	4	static
+../source/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c:118:1:crypto_scalarmult_ed25519_scalarbytes	4	static

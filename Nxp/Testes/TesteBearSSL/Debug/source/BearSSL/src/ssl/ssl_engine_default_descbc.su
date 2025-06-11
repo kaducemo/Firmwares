@@ -1,0 +1,3 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1493:1:br_ssl_engine_set_des_cbc	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:1596:1:br_ssl_engine_set_cbc	24	static
+../source/BearSSL/src/ssl/ssl_engine_default_descbc.c:29:1:br_ssl_engine_set_default_des_cbc	16	static

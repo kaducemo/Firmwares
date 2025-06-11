@@ -1,0 +1,1 @@
+../source/BearSSL/src/hash/ghash_pclmul.c:384:1:br_ghash_pclmul_get	4	static

@@ -1,0 +1,7 @@
+../source/libsodium/crypto_verify/verify.c:10:1:crypto_verify_16_bytes	4	static
+../source/libsodium/crypto_verify/verify.c:16:1:crypto_verify_32_bytes	4	static
+../source/libsodium/crypto_verify/verify.c:22:1:crypto_verify_64_bytes	4	static
+../source/libsodium/crypto_verify/verify.c:63:1:crypto_verify_n	40	static
+../source/libsodium/crypto_verify/verify.c:88:1:crypto_verify_16	16	static
+../source/libsodium/crypto_verify/verify.c:94:1:crypto_verify_32	16	static
+../source/libsodium/crypto_verify/verify.c:100:1:crypto_verify_64	16	static

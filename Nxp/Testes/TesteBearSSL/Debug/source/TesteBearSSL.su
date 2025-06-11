@@ -1,0 +1,4 @@
+../source/TesteBearSSL.c:62:7:hex_array_to_string	32	static
+../source/TesteBearSSL.c:88:5:keygen_ec	176	static
+../source/TesteBearSSL.c:129:5:ComputeSharedSecret	56	static
+../source/TesteBearSSL.c:151:5:main	1032	static

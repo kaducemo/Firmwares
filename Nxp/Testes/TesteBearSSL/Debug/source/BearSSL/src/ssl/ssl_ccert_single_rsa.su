@@ -1,0 +1,6 @@
+../source/BearSSL/src/ssl/ssl_ccert_single_rsa.c:28:1:cc_none0	16	static
+../source/BearSSL/src/ssl/ssl_ccert_single_rsa.c:34:1:cc_none1	16	static
+../source/BearSSL/src/ssl/ssl_ccert_single_rsa.c:41:1:cc_none2	24	static
+../source/BearSSL/src/ssl/ssl_ccert_single_rsa.c:50:1:cc_choose	32	static
+../source/BearSSL/src/ssl/ssl_ccert_single_rsa.c:101:1:cc_do_sign	120	static
+../source/BearSSL/src/ssl/ssl_ccert_single_rsa.c:139:1:br_ssl_client_set_single_rsa	24	static

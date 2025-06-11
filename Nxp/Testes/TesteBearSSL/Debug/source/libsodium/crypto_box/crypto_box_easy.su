@@ -1,0 +1,8 @@
+../source/libsodium/crypto_box/crypto_box_easy.c:13:1:crypto_box_detached_afternm	40	static
+../source/libsodium/crypto_box/crypto_box_easy.c:21:1:crypto_box_detached	80	static
+../source/libsodium/crypto_box/crypto_box_easy.c:40:1:crypto_box_easy_afternm	40	static
+../source/libsodium/crypto_box/crypto_box_easy.c:52:1:crypto_box_easy	48	static
+../source/libsodium/crypto_box/crypto_box_easy.c:64:1:crypto_box_open_detached_afternm	40	static
+../source/libsodium/crypto_box/crypto_box_easy.c:74:1:crypto_box_open_detached	80	static
+../source/libsodium/crypto_box/crypto_box_easy.c:92:1:crypto_box_open_easy_afternm	48	static
+../source/libsodium/crypto_box/crypto_box_easy.c:105:1:crypto_box_open_easy	56	static

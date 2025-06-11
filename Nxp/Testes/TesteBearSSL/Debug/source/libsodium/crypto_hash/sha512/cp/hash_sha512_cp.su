@@ -1,0 +1,11 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:65:1:rotr64	48	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:146:1:load64_be	152	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:167:1:store64_be	24	static
+../source/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c:41:1:be64enc_vect	32	static
+../source/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c:51:1:be64dec_vect	40	static
+../source/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c:114:1:SHA512_Transform	3248	static
+../source/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c:173:1:SHA512_Pad	24	static
+../source/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c:196:1:crypto_hash_sha512_init	16	static
+../source/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c:211:1:crypto_hash_sha512_update	888	static
+../source/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c:261:1:crypto_hash_sha512_final	720	static
+../source/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c:274:1:crypto_hash_sha512	232	static

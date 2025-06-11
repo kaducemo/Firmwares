@@ -1,0 +1,4 @@
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:44:1:rotl32	16	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:113:1:load32_le	24	static
+C:\Local\FIRMWARE\TESTES\FRDM_K64F\Teste2Sodium\source\libsodium\include\sodium/private/common.h:130:1:store32_le	16	static
+../source/libsodium/crypto_core/hsalsa20/ref2/core_hsalsa20_ref2.c:17:1:crypto_core_hsalsa20	96	static

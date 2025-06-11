@@ -1,0 +1,12 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:596:1:br_enc64be	32	static
+../source/BearSSL/src/hash/sha2big.c:95:1:sha2big_round	2544	static
+../source/BearSSL/src/hash/sha2big.c:144:1:sha2big_update	56	static
+../source/BearSSL/src/hash/sha2big.c:171:1:sha2big_out	232	static
+../source/BearSSL/src/hash/sha2big.c:196:1:br_sha384_init	16	static
+../source/BearSSL/src/hash/sha2big.c:205:1:br_sha384_update	24	static
+../source/BearSSL/src/hash/sha2big.c:212:1:br_sha384_out	16	static
+../source/BearSSL/src/hash/sha2big.c:219:1:br_sha384_state	16	static
+../source/BearSSL/src/hash/sha2big.c:227:1:br_sha384_set_state	24	static
+../source/BearSSL/src/hash/sha2big.c:235:1:br_sha512_init	16	static
+../source/BearSSL/src/hash/sha2big.c:244:1:br_sha512_out	16	static

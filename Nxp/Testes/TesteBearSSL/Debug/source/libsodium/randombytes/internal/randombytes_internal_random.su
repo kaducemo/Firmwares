@@ -1,0 +1,12 @@
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:162:1:sodium_hrtime	80	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:287:1:randombytes_internal_random_random_dev_open	104	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:326:1:safe_read	32	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:352:1:randombytes_internal_random_init	16	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:404:1:randombytes_internal_random_stir	16	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:458:1:randombytes_internal_random_stir_if_needed	8	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:493:1:randombytes_internal_random_close	16	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:530:1:randombytes_internal_random_xorhwrand	4	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:551:1:randombytes_internal_random_xorkey	24	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:566:1:randombytes_internal_random_buf	48	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:598:1:randombytes_internal_random	40	static
+../source/libsodium/randombytes/internal/randombytes_internal_random.c:628:1:randombytes_internal_implementation_name	4	static

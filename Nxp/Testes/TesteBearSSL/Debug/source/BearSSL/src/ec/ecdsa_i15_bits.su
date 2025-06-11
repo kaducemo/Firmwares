@@ -1,0 +1,2 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1513:1:br_i15_zero	16	static
+../source/BearSSL/src/ec/ecdsa_i15_bits.c:29:1:br_ecdsa_i15_bits2int	40	static

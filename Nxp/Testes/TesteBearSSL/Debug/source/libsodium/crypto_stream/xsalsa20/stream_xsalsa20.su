@@ -1,0 +1,7 @@
+../source/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c:8:1:crypto_stream_xsalsa20	72	static
+../source/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c:22:1:crypto_stream_xsalsa20_xor_ic	88	static
+../source/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c:37:1:crypto_stream_xsalsa20_xor	48	static
+../source/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c:45:1:crypto_stream_xsalsa20_keybytes	4	static
+../source/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c:51:1:crypto_stream_xsalsa20_noncebytes	4	static
+../source/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c:57:1:crypto_stream_xsalsa20_messagebytes_max	4	static
+../source/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c:63:1:crypto_stream_xsalsa20_keygen	16	static

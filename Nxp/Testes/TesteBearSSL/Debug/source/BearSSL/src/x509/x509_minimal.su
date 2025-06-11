@@ -1,0 +1,15 @@
+../source/BearSSL/src/x509/x509_minimal.c:13:1:t0_parse7E_unsigned	24	static
+../source/BearSSL/src/x509/x509_minimal.c:30:1:t0_parse7E_signed	32	static
+../source/BearSSL/src/x509/x509_minimal.c:221:1:br_x509_minimal_init	24	static
+../source/BearSSL/src/x509/x509_minimal.c:233:1:xm_start_chain	24	static
+../source/BearSSL/src/x509/x509_minimal.c:257:1:xm_start_cert	24	static
+../source/BearSSL/src/x509/x509_minimal.c:273:1:xm_append	32	static
+../source/BearSSL/src/x509/x509_minimal.c:287:1:xm_end_cert	24	static
+../source/BearSSL/src/x509/x509_minimal.c:299:1:xm_end_chain	24	static
+../source/BearSSL/src/x509/x509_minimal.c:317:1:xm_get_pkey	24	static
+../source/BearSSL/src/x509/x509_minimal.c:356:1:hash_dn	24	static
+../source/BearSSL/src/x509/x509_minimal.c:369:1:eqbigint	24	static
+../source/BearSSL/src/x509/x509_minimal.c:391:1:eqnocase	40	static
+../source/BearSSL/src/x509/x509_minimal.c:878:1:br_x509_minimal_init_main	40	static
+../source/BearSSL/src/x509/x509_minimal.c:883:1:br_x509_minimal_run	520	static
+../source/BearSSL/src/x509/x509_minimal.c:1670:1:verify_signature	112	static

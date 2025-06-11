@@ -1,0 +1,11 @@
+../source/libsodium/randombytes/randombytes.c:38:1:randombytes_init_if_needed	8	static
+../source/libsodium/randombytes/randombytes.c:47:1:randombytes_set_implementation	16	static
+../source/libsodium/randombytes/randombytes.c:55:1:randombytes_implementation_name	8	static
+../source/libsodium/randombytes/randombytes.c:66:1:randombytes_random	8	static
+../source/libsodium/randombytes/randombytes.c:79:1:randombytes_stir	8	static
+../source/libsodium/randombytes/randombytes.c:119:1:randombytes_uniform	24	static
+../source/libsodium/randombytes/randombytes.c:144:1:randombytes_buf	16	static
+../source/libsodium/randombytes/randombytes.c:162:1:randombytes_buf_deterministic	40	static
+../source/libsodium/randombytes/randombytes.c:181:1:randombytes_seedbytes	4	static
+../source/libsodium/randombytes/randombytes.c:187:1:randombytes_close	8	static
+../source/libsodium/randombytes/randombytes.c:196:1:randombytes	24	static

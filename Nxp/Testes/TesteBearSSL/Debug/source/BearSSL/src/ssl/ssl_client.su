@@ -1,0 +1,4 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:2032:1:br_ssl_engine_last_error	16	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:2857:1:br_ssl_client_forget_session	16	static
+../source/BearSSL/src/ssl/ssl_client.c:29:1:br_ssl_client_zero	16	static
+../source/BearSSL/src/ssl/ssl_client.c:42:1:br_ssl_client_reset	32	static

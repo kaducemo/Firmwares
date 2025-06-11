@@ -1,0 +1,3 @@
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
+C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1211:1:br_i32_zero	16	static
+../source/BearSSL/src/int/i32_decred.c:29:1:br_i32_decode_reduce	56	static
