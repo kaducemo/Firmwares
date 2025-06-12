@@ -1,0 +1,9 @@
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteUartBearSSL\drivers/fsl_uart.h:653:20:UART_WriteByte	16	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteUartBearSSL\drivers/fsl_uart.h:667:23:UART_ReadByte	16	static
+../source/MyUartProjectBearSSL.c:47:6:UART0_RX_TX_IRQHandler	16	static
+../source/MyUartProjectBearSSL.c:60:6:UART4_RX_TX_IRQHandler	16	static
+../source/MyUartProjectBearSSL.c:73:7:hex_array_to_string	32	static
+../source/MyUartProjectBearSSL.c:99:5:keygen_ec	176	static
+../source/MyUartProjectBearSSL.c:140:5:ComputeSharedSecret	56	static
+../source/MyUartProjectBearSSL.c:154:6:delay	16	static
+../source/MyUartProjectBearSSL.c:167:5:main	1032	static
