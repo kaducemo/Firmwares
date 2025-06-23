@@ -1,7 +1,7 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:478:1:br_enc16be	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:596:1:br_enc64be	32	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:820:1:EQ0	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:478:1:br_enc16be	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:596:1:br_enc64be	32	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:820:1:EQ0	24	static
 ../source/BearSSL/src/aead/ccm.c:51:1:br_ccm_init	16	static
 ../source/BearSSL/src/aead/ccm.c:58:1:br_ccm_reset	56	static
 ../source/BearSSL/src/aead/ccm.c:134:1:br_ccm_aad_inject	48	static

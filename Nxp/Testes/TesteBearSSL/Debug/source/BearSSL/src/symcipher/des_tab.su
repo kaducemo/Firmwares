@@ -1,5 +1,5 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:534:1:br_enc32be	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:566:1:br_dec32be	24	static
 ../source/BearSSL/src/symcipher/des_tab.c:205:1:Fconf	32	static
 ../source/BearSSL/src/symcipher/des_tab.c:222:1:process_block_unit	40	static
 ../source/BearSSL/src/symcipher/des_tab.c:242:1:br_des_tab_process_block	40	static

@@ -1,5 +1,5 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_hash.h:1142:1:br_multihash_setimpl	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_x509.h:779:1:br_x509_minimal_set_hash	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_x509.h:798:1:br_x509_minimal_set_rsa	16	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_x509.h:822:1:br_x509_minimal_set_ecdsa	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_hash.h:1142:1:br_multihash_setimpl	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_x509.h:779:1:br_x509_minimal_set_hash	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_x509.h:798:1:br_x509_minimal_set_rsa	16	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_x509.h:822:1:br_x509_minimal_set_ecdsa	24	static
 ../source/BearSSL/src/x509/x509_minimal_full.c:29:1:br_x509_minimal_init_full	32	static

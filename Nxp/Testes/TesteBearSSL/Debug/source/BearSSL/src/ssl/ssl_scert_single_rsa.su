@@ -1,5 +1,5 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:3701:1:br_ssl_server_get_client_suites	16	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:3738:1:br_ssl_server_get_client_hashes	16	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:3701:1:br_ssl_server_get_client_suites	16	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:3738:1:br_ssl_server_get_client_hashes	16	static
 ../source/BearSSL/src/ssl/ssl_scert_single_rsa.c:28:1:sr_choose	56	static
 ../source/BearSSL/src/ssl/ssl_scert_single_rsa.c:74:1:sr_do_keyx	32	static
 ../source/BearSSL/src/ssl/ssl_scert_single_rsa.c:115:1:sr_do_sign	120	static

@@ -1,4 +1,4 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:820:1:EQ0	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:820:1:EQ0	24	static
 ../source/BearSSL/src/aead/eax.c:63:1:omac_start	16	static
 ../source/BearSSL/src/aead/eax.c:76:1:double_gf128	32	static
 ../source/BearSSL/src/aead/eax.c:96:1:do_pad	40	static

@@ -1,2 +1,2 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:478:1:br_enc16be	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:478:1:br_enc16be	24	static
 ../source/BearSSL/src/ssl/ssl_keyexport.c:45:1:br_ssl_key_export	104	static

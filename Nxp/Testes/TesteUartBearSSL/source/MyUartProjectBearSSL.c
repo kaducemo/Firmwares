@@ -40,19 +40,24 @@ typedef struct KeygenResult
 
 Chave chavesLocais, chavesRemotas;
 
-uint8_t segredo1[32] = {0}, segredo2[32] = {0}; //Gera Segredos para comparacao
+uint8_t segredo1[65] = {0}, segredo2[32] = {0}; //Gera Segredos para comparacao
 
 
+uint8_t chavePublicaRemotaBuf[65] = {0};
+br_ec_public_key chavePublicaRemota = 	{
+											.curve = BR_EC_secp256r1,
+											.q = chavePublicaRemotaBuf,
+											.qlen = sizeof(chavePublicaRemotaBuf)
+										};
 
+uint8_t cont = 0;
 void UART0_SERIAL_RX_TX_IRQHANDLER(void)
 {
-    uint8_t data;
-
     /* If new data arrived. */
     if ((kUART_RxDataRegFullFlag | kUART_RxOverrunFlag) & UART_GetStatusFlags(UART0))
     {
-        data = UART_ReadByte(UART0);
-        UART_WriteByte(UART0, data);
+    	chavePublicaRemotaBuf[cont] = UART_ReadByte(UART0);
+    	cont = (cont+1)%65;
     }
     SDK_ISR_EXIT_BARRIER;
 }
@@ -105,7 +110,7 @@ int keygen_ec(int curve, Chave *ch)
 
     if (seeder == NULL)
     {
-    	PRINTF("ERRO: sem fonte de RANDOM\n\r");
+//    	PRINTF("ERRO: sem fonte de RANDOM\n\r");
     	ch->ok = -1;
     }
 
@@ -114,11 +119,11 @@ int keygen_ec(int curve, Chave *ch)
 
     if (!seeder(&rng.vtable))
     {
-    	PRINTF("Falha ao gerar funcao RANDOM\n\r");
+//    	PRINTF("Falha ao gerar funcao RANDOM\n\r");
     	ch->ok = -1;
     }
 
-    PRINTF("Nome da funcao Seeder: %s\n\r", seeder_name);
+//    PRINTF("Nome da funcao Seeder: %s\n\r", seeder_name);
 
     const br_ec_impl *impl = br_ec_get_default();
 
@@ -129,7 +134,7 @@ int keygen_ec(int curve, Chave *ch)
 
     if (length == 0)
     {
-    	PRINTF("-ERRO: Curva nao suportada\n\r");
+//    	PRINTF("-ERRO: Curva nao suportada\n\r");
     	ch->ok = -1;
 	}
 
@@ -142,8 +147,17 @@ int ComputeSharedSecret(br_ec_private_key *pvKey, br_ec_public_key *pbKey, uint8
 	const br_ec_impl *ec_implementation = br_ec_get_default();
 
 	br_ec_public_key tmp = *pbKey;
-	if (ec_implementation->mul(tmp.q, tmp.qlen, pvKey->x, pvKey->xlen, BR_EC_secp256r1))
-		memcpy(secret, tmp.q, 33);
+//	if (ec_implementation->mul(tmp.q, tmp.qlen, pvKey->x, pvKey->xlen, BR_EC_secp256r1))
+//		memcpy(secret, tmp.q, 33);
+//	else
+//		return -1;
+//
+	ec_implementation->mul(tmp.q, tmp.qlen, pvKey->x, pvKey->xlen, BR_EC_secp256r1);
+
+	if (tmp.qlen == 65) {
+	    memcpy(secret, tmp.q, 65);
+	    return 0;
+	}
 	else
 		return -1;
 
@@ -159,6 +173,22 @@ void delay(void)
         __asm("NOP"); /* delay */
     }
 }
+
+uint8_t* apply_pkcs7_padding(const uint8_t *input, size_t len, size_t *padded_len_out)
+{
+    size_t pad_len = 16 - (len % 16);
+    size_t padded_len = len + pad_len;
+
+    uint8_t *padded = malloc(padded_len);
+    if (!padded) return NULL;
+
+    memcpy(padded, input, len);
+    memset(padded + len, (uint8_t)pad_len, pad_len);
+
+    *padded_len_out = padded_len;
+    return padded;
+}
+
 /* TODO: insert other definitions and declarations here. */
 
 /*
@@ -176,6 +206,120 @@ int main(void) {
     BOARD_InitDebugConsole();
 #endif
 
+    const char *salt_hkdf = "DATAPROM";
+    const char *info = "SECRETCOMM";
+
+    uint8_t key[32] = {0};
+	uint8_t iv[16] = {0};
+	uint8_t encrypted[16] = {0};
+	uint8_t decrypted[16] = {0};
+	//uint8_t plain[16] = "DESAFIO, DP40\0"; // 16 bytes
+	uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!\0"; // 16 bytes
+
+
+    VOLTA:
+    memset(chavePublicaRemotaBuf, 0, sizeof(chavePublicaRemotaBuf));
+    memset(&chavesLocais, 0, sizeof(Chave));
+    memset(segredo1, 0, sizeof(segredo1));
+
+    memset(key, 0, sizeof(key));
+    memset(iv, 0, sizeof(iv));
+    memset(encrypted, 0, sizeof(encrypted));
+    memset(decrypted, 0, sizeof(decrypted));
+
+
+//   	memset(&chavesRemotas, 0, sizeof(Chave));
+
+    //Aloca buffers para chaves remotas e Locais
+	chavesLocais.pvKey.x = chavesLocais.pvBuf;
+	chavesLocais.pbKey.q = chavesLocais.pbBuf;
+
+	chavesRemotas.pbKey = chavePublicaRemota;
+
+
+    while(!chavePublicaRemotaBuf[64]); //Espera para receber a chave pública
+
+    if(keygen_ec(BR_EC_secp256r1, &chavesLocais) == 1) // Gera chaves Locais
+	{
+    	UART_WriteBlocking(UART0, chavesLocais.pbKey.q, chavesLocais.pbKey.qlen);
+    	if(!ComputeSharedSecret(&chavesLocais.pvKey, &chavesRemotas.pbKey, segredo1))
+    	{
+//    		uint8_t key[32] = {0};
+//    			uint8_t iv[16] = {0};
+//    			uint8_t encrypted[16] = {0};
+//    			uint8_t decrypted[16] = {0};
+//    			uint8_t plain[16] = "DESAFIO, DP40\0"; // 16 bytes
+
+//    		const char *salt_hkdf = "DATAPROM";
+//			const char *info = "SECRETCOMM";
+//
+//			uint8_t key[32] = {0};
+//			uint8_t iv[16] = {0};
+//			uint8_t encrypted[16] = {0};
+//			uint8_t decrypted[16] = {0};
+//			uint8_t plain[16] = "DESAFIO, DP40\0"; // 16 bytes
+
+			br_hkdf_context hkdf;
+			br_hkdf_init(&hkdf, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
+			br_hkdf_inject(&hkdf, segredo1, sizeof(segredo1));
+			br_hkdf_flip(&hkdf);
+			br_hkdf_produce(&hkdf, info, strlen(info), key, sizeof(key));
+			br_hkdf_produce(&hkdf, info, strlen(info), iv, sizeof(iv));
+
+
+			uint8_t iv_original[16] = {0};
+			memcpy(iv_original, iv, 16); // salva o IV original
+
+			size_t padded_len_out = 0;
+			apply_pkcs7_padding(plain, sizeof(plain), &padded_len_out);
+
+			br_aes_small_cbcenc_keys  ctx_enc;
+			br_aes_small_cbcenc_init(&ctx_enc, key, sizeof(key));
+			memcpy(encrypted, plain, 16);
+			br_aes_small_cbcenc_run(&ctx_enc, iv, encrypted, padded_len_out); //Aqui IV será modificado
+
+//			delay();
+
+			/*Envia */
+			UART_WriteBlocking(UART0, encrypted, sizeof(encrypted));
+
+//			br_aes_small_cbcdec_keys ctx_dec;
+//			uint8_t iv_dec[16];
+//			memcpy(iv_dec, iv_original, 16); // reset IV
+//			memcpy(decrypted, encrypted, 16);
+//			br_aes_small_cbcdec_init(&ctx_dec, key, sizeof(key));
+//			br_aes_small_cbcdec_run(&ctx_dec, iv_dec, decrypted, 16);
+
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+
+    	}
+    	else
+    	{
+    		while(true);
+    	}
+
+//    	if (secret_len == 32)
+//    	{
+//    	    asm("NOP");
+//    	} else {
+//    		asm("NOP");
+//    	}
+
+
+	}
+
+
+
+    goto VOLTA;
+
+/*=========================================================================================*/
+/*=========================================================================================*/
+/*=========================================================================================*/
+
+
+
 
     memset(&chavesLocais, 0, sizeof(Chave));
     memset(&chavesRemotas, 0, sizeof(Chave));
@@ -192,12 +336,16 @@ int main(void) {
 	{
     	PRINTF("Chaves Locais Geradas! \n\r");
     	char *strPvKey = hex_array_to_string(chavesLocais.pvKey.x, 32);
+    	char *strPvKeypb = hex_array_to_string(chavesLocais.pbKey.q, 65);
 
     	if (chavesLocais.ok == 1)
 		{
 			PRINTF("Tamanho Chave Privada Local: %d, Tamanho Chave Publica Local: %d\n", chavesLocais.pvKey.xlen, chavesLocais.pbKey.qlen);
+			PRINTF("Chave Local Publica: %s\n\n\n", strPvKeypb);
 			PRINTF("Chave Local Privada: %s\n\n\n", strPvKey);
+
 			free(strPvKey);
+			free(strPvKeypb);
 
 			if(keygen_ec(BR_EC_secp256r1, &chavesRemotas) == 1)
 			{
@@ -225,11 +373,7 @@ int main(void) {
 						}
 					}
 
-
-					const char *salt_hkdf = "DATAPROM";
-					const char *info = "SECRETCOMM";
-
-					uint8_t key[16] = {0};
+					uint8_t key[32] = {0};
 					uint8_t iv[16] = {0};
 
 					uint8_t plain[16] = "Hello, world!\0"; // 16 bytes
@@ -237,15 +381,7 @@ int main(void) {
 					uint8_t encrypted[16]= {0};
 					uint8_t decrypted[16]= {0};
 
-					PRINTF("--{ ECDH + HKDF + AES-CBC }--\n\r");
 
-					// Derivação da chave e IV com HKDF - SHA512
-//					br_hkdf_context hkdf;
-//					br_hkdf_init(&hkdf, &br_sha512_vtable, salt_hkdf, strlen(salt_hkdf));
-//					br_hkdf_inject(&hkdf, segredo1, sizeof(segredo1));
-//					br_hkdf_flip(&hkdf);
-//					br_hkdf_produce(&hkdf, info, strlen(info), key, sizeof(key));
-//					br_hkdf_produce(&hkdf, info, strlen(info), iv, sizeof(iv));
 
 					// Derivação da chave e IV com HKDF - SHA256
 					br_hkdf_context hkdf;

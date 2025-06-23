@@ -1,7 +1,7 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\drivers/fsl_clock.h:668:20:CLOCK_EnableClock	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\drivers/fsl_port.h:271:20:PORT_SetPinConfig	32	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\drivers/fsl_port.h:374:20:PORT_SetPinMux	24	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\drivers/fsl_port.h:443:20:PORT_SetPinInterruptConfig	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\drivers/fsl_clock.h:668:20:CLOCK_EnableClock	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\drivers/fsl_port.h:271:20:PORT_SetPinConfig	32	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\drivers/fsl_port.h:374:20:PORT_SetPinMux	24	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\drivers/fsl_port.h:443:20:PORT_SetPinInterruptConfig	24	static
 ../board/pin_mux.c:134:6:BOARD_InitBootPins	8	static
 ../board/pin_mux.c:157:6:BOARD_InitPins	8	static
 ../board/pin_mux.c:202:6:BOARD_InitButtonsPins	24	static

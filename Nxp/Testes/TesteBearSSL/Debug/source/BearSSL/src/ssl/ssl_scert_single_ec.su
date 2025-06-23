@@ -1,6 +1,6 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_hash.h:1164:1:br_multihash_getimpl	16	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:3701:1:br_ssl_server_get_client_suites	16	static
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:3738:1:br_ssl_server_get_client_hashes	16	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_hash.h:1164:1:br_multihash_getimpl	16	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:3701:1:br_ssl_server_get_client_suites	16	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\inc/bearssl_ssl.h:3738:1:br_ssl_server_get_client_hashes	16	static
 ../source/BearSSL/src/ssl/ssl_scert_single_ec.c:28:1:se_choose	48	static
 ../source/BearSSL/src/ssl/ssl_scert_single_ec.c:81:1:se_do_keyx	56	static
 ../source/BearSSL/src/ssl/ssl_scert_single_ec.c:97:1:se_do_sign	112	static

@@ -1,12 +1,11 @@
 /*
  * GENERATED FILE - DO NOT EDIT
- * Copyright (c) 2008-2013 Code Red Technologies Ltd,
- * Copyright 2015, 2018-2019 NXP
- * (c) NXP Semiconductors 2013-2025
+ * Copyright 2008-2013 Code Red Technologies Ltd,
+ * Copyright 2013-2025 NXP
  * Generated linker script file for MK64FN1M0xxx12
  * Created from linkscript.ldt by FMCreateLinkLibraries
  * Using Freemarker v2.3.30
- * MCUXpresso IDE v11.7.0 [Build 9198] [2023-01-17] on 26 de mai de 2025 10:51:28
+ * MCUXpresso IDE v11.8.1 [Build 1197] [2023-10-27] on 12 de jun. de 2025 21:57:03
  */
 
 INCLUDE "TesteBearSSL_Debug_library.ld"
@@ -150,7 +149,7 @@ SECTIONS
     } > SRAM_UPPER AT>PROGRAM_FLASH
 
     /* BSS section for SRAM_LOWER */
-    .bss_RAM2 : ALIGN(8)
+    .bss_RAM2 (NOLOAD) : ALIGN(8)
     {
        PROVIDE(__start_bss_RAM2 = .) ;
        PROVIDE(__start_bss_SRAM_LOWER = .) ;
@@ -164,7 +163,7 @@ SECTIONS
     } > SRAM_LOWER AT> SRAM_LOWER
 
     /* BSS section for FLEX_RAM */
-    .bss_RAM3 : ALIGN(8)
+    .bss_RAM3 (NOLOAD) : ALIGN(8)
     {
        PROVIDE(__start_bss_RAM3 = .) ;
        PROVIDE(__start_bss_FLEX_RAM = .) ;
@@ -178,7 +177,7 @@ SECTIONS
     } > FLEX_RAM AT> FLEX_RAM
 
     /* MAIN BSS SECTION */
-    .bss : ALIGN(8)
+    .bss (NOLOAD) : ALIGN(8)
     {
         _bss = .;
         PROVIDE(__start_bss_RAM = .) ;

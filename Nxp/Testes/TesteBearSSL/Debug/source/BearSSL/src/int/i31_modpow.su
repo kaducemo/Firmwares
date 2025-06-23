@@ -1,2 +1,2 @@
-C:\Local\FIRMWARE\GITHUB\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1359:1:br_i31_zero	16	static
+C:\Local\FIRMWARE\GIT\Firmwares\Nxp\Testes\TesteBearSSL\source\BearSSL\src/inner.h:1359:1:br_i31_zero	16	static
 ../source/BearSSL/src/int/i31_modpow.c:29:1:br_i31_modpow	48	static
