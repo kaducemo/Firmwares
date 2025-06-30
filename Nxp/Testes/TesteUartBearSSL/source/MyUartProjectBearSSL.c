@@ -28,6 +28,9 @@
 /*******************************************************************************
  * Code
  ******************************************************************************/
+#define CLEAR_MSB_N_BITS(byte, n) ((byte) & (255U >> n))
+#define CLEAR_LSB_N_BITS(byte, n) ((byte) & (255U << n))
+
 
 typedef struct KeygenResult
 {
@@ -42,6 +45,8 @@ Chave chavesLocais, chavesRemotas;
 
 uint8_t segredo1[65] = {0}, segredo2[32] = {0}; //Gera Segredos para comparacao
 
+uint8_t rxSerialBuffer[512] = {0}; //Buffer utilizado na porta serial
+size_t qtDadosDisponiveis = 0; //Diz quantos bytes estão disponíveis para serem lidos quando um pacote é fechado
 
 uint8_t chavePublicaRemotaBuf[65] = {0};
 br_ec_public_key chavePublicaRemota = 	{
@@ -50,16 +55,66 @@ br_ec_public_key chavePublicaRemota = 	{
 											.qlen = sizeof(chavePublicaRemotaBuf)
 										};
 
-uint8_t cont = 0;
+
 void UART0_SERIAL_RX_TX_IRQHANDLER(void)
 {
+	static uint8_t cont = 0;
+	static uint8_t recebendoPacote = 0;
     /* If new data arrived. */
     if ((kUART_RxDataRegFullFlag | kUART_RxOverrunFlag) & UART_GetStatusFlags(UART0))
     {
-    	chavePublicaRemotaBuf[cont] = UART_ReadByte(UART0);
-    	cont = (cont+1)%65;
+    	rxSerialBuffer[cont] = UART_ReadByte(UART0);
+    	if(rxSerialBuffer[cont] == 0x02) //Inicio de Frame
+    	{
+    		recebendoPacote = 1;
+    		qtDadosDisponiveis = 0;
+    		cont = 0;
+    	}
+    	if(recebendoPacote)
+    	{
+    		if(cont < 512-1)
+    		{
+    			cont++;
+    			if(rxSerialBuffer[cont - 1] == 0x03)
+				{
+					qtDadosDisponiveis = cont-2; //Retira 0x02 e 0x03 da contagem
+					cont = 0;
+					recebendoPacote = 0;
+				}
+    		}
+    		else //Estourou Buffer
+    		{
+    			cont = 0;
+    			recebendoPacote = 0;
+    			qtDadosDisponiveis = 0;
+    		}
+    	}
     }
     SDK_ISR_EXIT_BARRIER;
+}
+
+size_t DadosProntosParaLeitura()
+{
+	return qtDadosDisponiveis;
+}
+
+size_t LeDadosSerial(uint8_t **output)
+{
+	size_t qty = 0;
+
+	if(qtDadosDisponiveis)
+	{
+		*output = &rxSerialBuffer[1]; //salva quantos bytes foram lidos
+		qty = qtDadosDisponiveis;
+		qtDadosDisponiveis = 0;
+	}
+	else
+	{
+		output = NULL;
+		qty = 0;
+	}
+
+	return qty;
 }
 
 void UART4_SERIAL_RX_TX_IRQHANDLER(void)
@@ -189,6 +244,126 @@ uint8_t* apply_pkcs7_padding(const uint8_t *input, size_t len, size_t *padded_le
     return padded;
 }
 
+uint8_t* CodificaDados7bits(const uint8_t *input, size_t len_input, size_t *len_out)
+{
+	uint8_t *output = NULL;
+	*len_out = ((len_input*8) % 7) ? ((len_input*8) / 7) + 1: (len_input*8) / 7;
+
+	output = malloc (*len_out);
+	if(output == NULL)
+	{
+		*len_out = 0;
+		return output;
+	}
+	else
+	{
+		memset(output,0,*len_out);
+		int j = *len_out - 1;
+		uint8_t msb = 0, lsb = 0, shift = 1;
+
+
+		for(int i  = len_input - 1; i >= 0 ; i--)
+		{
+			msb = input[i];
+			msb >>= shift;
+			lsb = input[i];
+
+			lsb = CLEAR_MSB_N_BITS(lsb, (8-shift));
+			lsb <<= (7 - shift);
+
+
+			output[j] |= 0x80;
+			output[j] |= msb;
+			j--;
+			output[j] |= 0x80;
+			output[j] |= lsb;
+
+			if((shift + 1) % 8)
+			{
+				shift++;
+
+			}
+			else
+			{
+				shift = 1;
+				j--;
+			}
+		}
+	}
+	return output;
+
+}
+
+uint8_t* DecodificaDados7bits(const uint8_t* input, size_t len_input, size_t* len_out)
+{
+    if (!input || len_input == 0 || !len_out) return NULL;
+
+    size_t total_bits = len_input * 7; // 7 bits úteis por byte
+    *len_out = total_bits / 8;         // número de bytes originais
+    uint8_t* output = malloc(*len_out);
+    if (!output) {
+        *len_out = 0;
+        return NULL;
+    }
+
+    memset(output, 0, *len_out);
+
+    int in_index = len_input - 1;
+    int out_index = *len_out - 1;
+    uint8_t shift = 1;
+
+    for(out_index = *len_out-1; out_index>= 0 ; out_index--)
+    {
+    	output[out_index] = input[in_index] << shift;
+    	output[out_index] = CLEAR_LSB_N_BITS(output[out_index], shift);
+    	//uint8_t aux = (input[in_index -1] & 0b01111111) >> (7-shift) ;
+    	output[out_index] |= (input[in_index -1] & 0b01111111) >> (7-shift);
+    	in_index--;
+    	if((shift + 1) % 8)
+		{
+			shift++;
+
+		}
+		else
+		{
+			shift = 1;
+			in_index--;
+		}
+    }
+
+    return output;
+}
+
+uint8_t *CriaQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
+{
+	uint8_t *output = NULL, *codificado = NULL;
+	size_t qOut = 0;
+	*qOutput = 0;
+
+	codificado = CodificaDados7bits(input, q, &qOut);
+
+	if(!qOut)
+		return NULL;
+
+
+	output = malloc(qOut+2);
+	if(output == NULL)	return NULL;
+
+	*qOutput =  qOut+2;
+
+	memset(output, 0, *qOutput);
+
+	output[0] = 0x02;// Insere Headers
+	output[(*qOutput)-1] = 0x03;
+
+	memcpy(&output[1], codificado, qOut);
+	free(codificado);
+
+	return output;
+}
+
+
+
 /* TODO: insert other definitions and declarations here. */
 
 /*
@@ -205,16 +380,27 @@ int main(void) {
     /* Init FSL debug console. */
     BOARD_InitDebugConsole();
 #endif
+    //uint8_t meusDados[] = {0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101};
+//    uint8_t meusDados[56] = { [0 ... 55] = 0xFF };
+//    //uint8_t meusDados[22] = {0xF0};
+//    uint8_t tamSaida = 0, tamEntrada = 0;
+//
+//    uint8_t *minhaSaida = EmpacotaDadosProtocolo(meusDados, sizeof(meusDados), &tamSaida);
+//    uint8_t *entradaRecuperada = DesempacotaDadosProtocolo(minhaSaida, tamSaida, &tamEntrada);
 
     const char *salt_hkdf = "DATAPROM";
     const char *info = "SECRETCOMM";
 
     uint8_t key[32] = {0};
 	uint8_t iv[16] = {0};
-	uint8_t encrypted[16] = {0};
+	uint8_t *encrypted = NULL;
+	//uint8_t encrypted[16] = {0};
 	uint8_t decrypted[16] = {0};
 	//uint8_t plain[16] = "DESAFIO, DP40\0"; // 16 bytes
-	uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!\0"; // 16 bytes
+	uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!"; // 16 bytes
+
+	size_t tamPacoteRx = 0, tamPacoteTx = 0;
+	size_t tamPacoteDecodifcado = 0;
 
 
     VOLTA:
@@ -224,11 +410,7 @@ int main(void) {
 
     memset(key, 0, sizeof(key));
     memset(iv, 0, sizeof(iv));
-    memset(encrypted, 0, sizeof(encrypted));
-    memset(decrypted, 0, sizeof(decrypted));
 
-
-//   	memset(&chavesRemotas, 0, sizeof(Chave));
 
     //Aloca buffers para chaves remotas e Locais
 	chavesLocais.pvKey.x = chavesLocais.pvBuf;
@@ -236,28 +418,35 @@ int main(void) {
 
 	chavesRemotas.pbKey = chavePublicaRemota;
 
+	while(!DadosProntosParaLeitura()); //Espera para receber a chave pública
 
-    while(!chavePublicaRemotaBuf[64]); //Espera para receber a chave pública
+	uint8_t *pacoteRecebido;
+	uint8_t *pacoteEnviado;
+	uint8_t *pacoteDecodificado;
+	tamPacoteRx = LeDadosSerial(&pacoteRecebido);
+
+
+	if(!tamPacoteRx)
+		while(true); //Erro
+
+	pacoteDecodificado = DecodificaDados7bits(pacoteRecebido, tamPacoteRx, &tamPacoteDecodifcado);
+	if(tamPacoteDecodifcado != 65)
+		while(true); //Erro
+
+	memcpy(chavePublicaRemotaBuf, pacoteDecodificado, tamPacoteDecodifcado);
+	free(pacoteDecodificado); //Libera a memória alocada para o pacote
+
 
     if(keygen_ec(BR_EC_secp256r1, &chavesLocais) == 1) // Gera chaves Locais
 	{
-    	UART_WriteBlocking(UART0, chavesLocais.pbKey.q, chavesLocais.pbKey.qlen);
+
+    	pacoteEnviado = CriaQuadroCodificado(chavesLocais.pbKey.q, chavesLocais.pbKey.qlen, &tamPacoteTx);
+
+    	UART_WriteBlocking(UART0, pacoteEnviado, tamPacoteTx);
+    	free(pacoteEnviado);
+
     	if(!ComputeSharedSecret(&chavesLocais.pvKey, &chavesRemotas.pbKey, segredo1))
     	{
-//    		uint8_t key[32] = {0};
-//    			uint8_t iv[16] = {0};
-//    			uint8_t encrypted[16] = {0};
-//    			uint8_t decrypted[16] = {0};
-//    			uint8_t plain[16] = "DESAFIO, DP40\0"; // 16 bytes
-
-//    		const char *salt_hkdf = "DATAPROM";
-//			const char *info = "SECRETCOMM";
-//
-//			uint8_t key[32] = {0};
-//			uint8_t iv[16] = {0};
-//			uint8_t encrypted[16] = {0};
-//			uint8_t decrypted[16] = {0};
-//			uint8_t plain[16] = "DESAFIO, DP40\0"; // 16 bytes
 
 			br_hkdf_context hkdf;
 			br_hkdf_init(&hkdf, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
@@ -271,17 +460,32 @@ int main(void) {
 			memcpy(iv_original, iv, 16); // salva o IV original
 
 			size_t padded_len_out = 0;
-			apply_pkcs7_padding(plain, sizeof(plain), &padded_len_out);
+			uint8_t *paddedPlain = apply_pkcs7_padding(plain, sizeof(plain), &padded_len_out);
 
 			br_aes_small_cbcenc_keys  ctx_enc;
 			br_aes_small_cbcenc_init(&ctx_enc, key, sizeof(key));
-			memcpy(encrypted, plain, 16);
+			encrypted = malloc(padded_len_out);
+			if(encrypted == NULL)
+				while(true);
+
+			memcpy(encrypted, paddedPlain, padded_len_out);
+			free(paddedPlain);
 			br_aes_small_cbcenc_run(&ctx_enc, iv, encrypted, padded_len_out); //Aqui IV será modificado
 
-//			delay();
-
 			/*Envia */
-			UART_WriteBlocking(UART0, encrypted, sizeof(encrypted));
+			pacoteEnviado = CriaQuadroCodificado(encrypted, padded_len_out, &tamPacoteTx);
+			free(encrypted);
+			UART_WriteBlocking(UART0, pacoteEnviado, tamPacoteTx);
+			free(pacoteEnviado);
+
+
+//			UART_WriteBlocking(UART0, paddedPlain, padded_len_out);
+//			UART_WriteBlocking(UART0, encrypted, padded_len_out);
+//			UART_WriteBlocking(UART0, encrypted, sizeof(encrypted));
+
+			/*Libera a memoria alocada*/
+//			free(paddedPlain);
+//			free(encrypted);
 
 //			br_aes_small_cbcdec_keys ctx_dec;
 //			uint8_t iv_dec[16];
@@ -299,175 +503,13 @@ int main(void) {
     	{
     		while(true);
     	}
-
-//    	if (secret_len == 32)
-//    	{
-//    	    asm("NOP");
-//    	} else {
-//    		asm("NOP");
-//    	}
-
-
 	}
-
-
 
     goto VOLTA;
 
 /*=========================================================================================*/
 /*=========================================================================================*/
 /*=========================================================================================*/
-
-
-
-
-    memset(&chavesLocais, 0, sizeof(Chave));
-    memset(&chavesRemotas, 0, sizeof(Chave));
-
-    //Aloca buffers para chaves remotas e Locais
-    chavesLocais.pvKey.x = chavesLocais.pvBuf;
-    chavesRemotas.pvKey.x = chavesRemotas.pvBuf;
-
-    chavesLocais.pbKey.q = chavesLocais.pbBuf;
-    chavesRemotas.pbKey.q = chavesRemotas.pbBuf;
-
-
-    if(keygen_ec(BR_EC_secp256r1, &chavesLocais) == 1)
-	{
-    	PRINTF("Chaves Locais Geradas! \n\r");
-    	char *strPvKey = hex_array_to_string(chavesLocais.pvKey.x, 32);
-    	char *strPvKeypb = hex_array_to_string(chavesLocais.pbKey.q, 65);
-
-    	if (chavesLocais.ok == 1)
-		{
-			PRINTF("Tamanho Chave Privada Local: %d, Tamanho Chave Publica Local: %d\n", chavesLocais.pvKey.xlen, chavesLocais.pbKey.qlen);
-			PRINTF("Chave Local Publica: %s\n\n\n", strPvKeypb);
-			PRINTF("Chave Local Privada: %s\n\n\n", strPvKey);
-
-			free(strPvKey);
-			free(strPvKeypb);
-
-			if(keygen_ec(BR_EC_secp256r1, &chavesRemotas) == 1)
-			{
-				PRINTF("Chaves Remotas Geradas! \n\r");
-				char *strPvKey2 = hex_array_to_string(chavesRemotas.pvKey.x, 32);
-
-				if (chavesRemotas.ok == 1)
-				{
-					PRINTF("Tamanho Chave Privada Remota: %d, Tamanho Chave Publica Remota: %d\n", chavesRemotas.pvKey.xlen, chavesRemotas.pbKey.qlen);
-					PRINTF("Chave Remota Privada: %s\n", strPvKey2);
-					free(strPvKey2);
-
-					PRINTF("Gerando segredo compartilhado...\n\r");
-					if(!ComputeSharedSecret(&chavesLocais.pvKey, &chavesRemotas.pbKey, segredo1))
-					{
-						char *strPvKey3 = hex_array_to_string(segredo1, 32);
-						PRINTF("Segredo Gerado 1: %s\n\r", strPvKey3);
-						free(strPvKey3);
-
-						if(!ComputeSharedSecret(&chavesRemotas.pvKey, &chavesLocais.pbKey , segredo2))
-						{
-							char *strPvKey4 = hex_array_to_string(segredo2, 32);
-							PRINTF("Segredo Gerado 2 : %s\n\r", strPvKey4);
-							free(strPvKey4);
-						}
-					}
-
-					uint8_t key[32] = {0};
-					uint8_t iv[16] = {0};
-
-					uint8_t plain[16] = "Hello, world!\0"; // 16 bytes
-					PRINTF("Dados antes da Criptografia : %s\n\r", plain);
-					uint8_t encrypted[16]= {0};
-					uint8_t decrypted[16]= {0};
-
-
-
-					// Derivação da chave e IV com HKDF - SHA256
-					br_hkdf_context hkdf;
-					br_hkdf_init(&hkdf, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
-					br_hkdf_inject(&hkdf, segredo1, sizeof(segredo1));
-					br_hkdf_flip(&hkdf);
-					br_hkdf_produce(&hkdf, info, strlen(info), key, sizeof(key));
-					br_hkdf_produce(&hkdf, info, strlen(info), iv, sizeof(iv));
-
-
-					uint8_t iv_original[16] = {0};
-					memcpy(iv_original, iv, 16); // salva o IV original
-
-
-
-					char *strPvKey5 = hex_array_to_string(key, 16);
-					PRINTF("Chave Derivada: %s\n\r", strPvKey5);
-					free(strPvKey5);
-
-					char *strPvKey6 = hex_array_to_string(iv, 16);
-					PRINTF("IV Derivada: %s\n\r", strPvKey6);
-					free(strPvKey6);
-
-					// Criptografia AES-CBC (IMPLEMENTAÇÃO BIG - Mais rápido, mas usa mais memoria
-//					br_aes_big_cbcenc_keys ctx_enc;
-//					br_aes_big_cbcenc_init(&ctx_enc, key, sizeof(key));
-//					memcpy(encrypted, plain, 16);
-//					br_aes_big_cbcenc_run(&ctx_enc, iv, encrypted, 16); //Aqui IV será modificado
-
-					// Criptografia AES-CBC (IMPLEMENTAÇÃO SMALL - Lenta, mas usa menos memoria
-					br_aes_small_cbcenc_keys  ctx_enc;
-					br_aes_small_cbcenc_init(&ctx_enc, key, sizeof(key));
-					memcpy(encrypted, plain, 16);
-					br_aes_small_cbcenc_run(&ctx_enc, iv, encrypted, 16); //Aqui IV será modificado
-
-
-					char *strPvKey7 = hex_array_to_string(encrypted, 16);
-					PRINTF("Dado Criptografado: %s\n\r", strPvKey7);
-					free(strPvKey7);
-
-
-					// Descriptografia AES-CBC - BIG
-//					br_aes_big_cbcdec_keys ctx_dec;
-//					uint8_t iv_dec[16];
-//					memcpy(iv_dec, iv_original, 16); // reset IV
-//					memcpy(decrypted, encrypted, 16);
-//					br_aes_big_cbcdec_init(&ctx_dec, key, sizeof(key));
-//					br_aes_big_cbcdec_run(&ctx_dec, iv_dec, decrypted, 16);
-
-					// Descriptografia AES-CBC - SMALL
-					br_aes_small_cbcdec_keys ctx_dec;
-					uint8_t iv_dec[16];
-					memcpy(iv_dec, iv_original, 16); // reset IV
-					memcpy(decrypted, encrypted, 16);
-					br_aes_small_cbcdec_init(&ctx_dec, key, sizeof(key));
-					br_aes_small_cbcdec_run(&ctx_dec, iv_dec, decrypted, 16);
-
-					PRINTF("Dados Descriptografados: %s\n\r", decrypted);
-
-				}
-				else
-				{
-					PRINTF("-ERRO!");
-				}
-			}
-
-
-		} else
-		{
-			PRINTF("-ERRO!");
-		}
-
-	}
-    else
-    {
-    	PRINTF("Erro na geracao de chaves locais. Preso em Loop! \n\r");
-    }
-
-
-    PRINTF("FIM! Preso em Loop...\n\r");
-
-    /* Enter an infinite loop, just incrementing a counter. */
-    while(1)
-    {
-        __asm volatile ("nop");
-    }
 
     return 0 ;
 }
