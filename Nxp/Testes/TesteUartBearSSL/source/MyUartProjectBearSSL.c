@@ -22,6 +22,7 @@
 #include "MK64F12.h"
 #include "fsl_debug_console.h"
 #include "bearssl.h"
+#include "fsl_rnga.h"
 
 
 /* TODO: insert other include files here. */
@@ -54,6 +55,7 @@ br_ec_public_key chavePublicaRemota = 	{
 											.q = chavePublicaRemotaBuf,
 											.qlen = sizeof(chavePublicaRemotaBuf)
 										};
+uint64_t contadorMensagensTX = 0;
 
 
 void UART0_SERIAL_RX_TX_IRQHANDLER(void)
@@ -380,16 +382,9 @@ int main(void) {
     /* Init FSL debug console. */
     BOARD_InitDebugConsole();
 #endif
-    //uint8_t meusDados[] = {0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101,0b10100101};
-//    uint8_t meusDados[56] = { [0 ... 55] = 0xFF };
-//    //uint8_t meusDados[22] = {0xF0};
-//    uint8_t tamSaida = 0, tamEntrada = 0;
-//
-//    uint8_t *minhaSaida = EmpacotaDadosProtocolo(meusDados, sizeof(meusDados), &tamSaida);
-//    uint8_t *entradaRecuperada = DesempacotaDadosProtocolo(minhaSaida, tamSaida, &tamEntrada);
 
-    const char *salt_hkdf = "DATAPROM";
-    const char *info = "SECRETCOMM";
+    const char *salt_hkdf = "DATAPROM_SALT";
+    char info[18] = {'D','A','T','A','S','E','C','R','E','T','\0','\0','\0','\0','\0','\0','\0','\0'};
 
     uint8_t key[32] = {0};
 	uint8_t iv[16] = {0};
@@ -448,13 +443,22 @@ int main(void) {
     	if(!ComputeSharedSecret(&chavesLocais.pvKey, &chavesRemotas.pbKey, segredo1))
     	{
 
-			br_hkdf_context hkdf;
-			br_hkdf_init(&hkdf, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
-			br_hkdf_inject(&hkdf, segredo1, sizeof(segredo1));
-			br_hkdf_flip(&hkdf);
-			br_hkdf_produce(&hkdf, info, strlen(info), key, sizeof(key));
-			br_hkdf_produce(&hkdf, info, strlen(info), iv, sizeof(iv));
+    		memcpy(&info[10], &contadorMensagensTX, sizeof(contadorMensagensTX)); // Atualiza INFO a cada mensagem enviada
 
+    		// Produz Key
+			br_hkdf_context hkdfKey;
+			br_hkdf_init(&hkdfKey, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
+			br_hkdf_inject(&hkdfKey, segredo1, sizeof(segredo1));
+			br_hkdf_flip(&hkdfKey);
+			br_hkdf_produce(&hkdfKey, info, sizeof(info)- sizeof(contadorMensagensTX), key, sizeof(key));	 //Produz Chave
+
+
+			//Produz IV
+			br_hkdf_context hkdfIV;
+			br_hkdf_init(&hkdfIV, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
+			br_hkdf_inject(&hkdfIV, segredo1, sizeof(segredo1));
+			br_hkdf_flip(&hkdfIV);
+			br_hkdf_produce(&hkdfIV, info, sizeof(info), iv, sizeof(iv));
 
 			uint8_t iv_original[16] = {0};
 			memcpy(iv_original, iv, 16); // salva o IV original
@@ -469,14 +473,26 @@ int main(void) {
 				while(true);
 
 			memcpy(encrypted, paddedPlain, padded_len_out);
-			free(paddedPlain);
+
 			br_aes_small_cbcenc_run(&ctx_enc, iv, encrypted, padded_len_out); //Aqui IV será modificado
 
+			/*Anexa iterador ao quadro codificado*/
+			size_t tam_contador_encrypted = sizeof(contadorMensagensTX) + padded_len_out;
+			uint8_t *contador_encrypted = malloc(tam_contador_encrypted); // Aloca memória para adicionar Iterador aos dados criptgrafados
+			memcpy(contador_encrypted, &contadorMensagensTX, sizeof(contadorMensagensTX)); //Anexa contador Codificado no inicio da mensagem
+			memcpy(&contador_encrypted[sizeof(contadorMensagensTX)], encrypted, padded_len_out); //Anexa Dados Encriptados
+
+
+			/*Cria pacote codificado em 7 bits e adiciona headers de comunicação*/
+			pacoteEnviado = CriaQuadroCodificado(contador_encrypted, tam_contador_encrypted, &tamPacoteTx);
+
 			/*Envia */
-			pacoteEnviado = CriaQuadroCodificado(encrypted, padded_len_out, &tamPacoteTx);
-			free(encrypted);
 			UART_WriteBlocking(UART0, pacoteEnviado, tamPacoteTx);
+			free(encrypted);
 			free(pacoteEnviado);
+			free(contador_encrypted);
+			free(paddedPlain);
+			contadorMensagensTX++;
 
 
 //			UART_WriteBlocking(UART0, paddedPlain, padded_len_out);
