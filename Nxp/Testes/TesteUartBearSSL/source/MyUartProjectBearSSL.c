@@ -6,12 +6,13 @@
  */
 
 /**
- * @file    MyUartProject.c
+ * @file    MyUartProjectBearSSL.c
  * @brief   Application entry point.
- * Utilizando este FW, a placa serve como uma ponte entre dois dispositivos utilizando duas UARTs.
- * Neste caso, eu coloquei na UART (UART0, TX = PTB17, RX = PTB16 ) um módulo de BLUETOOTH e na outra UART (UART4, TX = PTE24 , RX = PTE25) a qual está
- * ligada a um conversor serial-USB embarcado na própria FRDM-K64, um PC. Dessa forma é possivel transferir comandos de um PC
- * para o módulo Bluetooth e vice versa.
+ * PoC realizada com Criptografia. Deve ser gravado na placa FRDM-K64. Utilizado e conjunto
+ * com um Software que se comunica com essa placa através da UART0. Neste FW, é trocadas
+ * chaves publicas, gerados segredos de curvas elipticas (P256), utilizado HKDF, para geração
+ * de Chaves e IVs para AES-256, finalmente é trocado um desafio/solução com o SW para validar
+ * todo o canal.
  */
 
 #include <stdio.h>
@@ -29,7 +30,7 @@
 /*******************************************************************************
  * Code
  ******************************************************************************/
-#define CLEAR_MSB_N_BITS(byte, n) ((byte) & (255U >> n))
+#define CLEAR_MSB_N_BITS(byte, n) ((byte) & (255U >> n)) //Macros auxiliares
 #define CLEAR_LSB_N_BITS(byte, n) ((byte) & (255U << n))
 
 
@@ -42,23 +43,24 @@ typedef struct KeygenResult
     int ok;
 }Chave;
 
-Chave chavesLocais, chavesRemotas;
+Chave chavesLocais, chavesRemotas; // Chaves Publicas e Privadas (locais e remotas)
 
 uint8_t segredo1[65] = {0}, segredo2[32] = {0}; //Gera Segredos para comparacao
 
 uint8_t rxSerialBuffer[512] = {0}; //Buffer utilizado na porta serial
 size_t qtDadosDisponiveis = 0; //Diz quantos bytes estão disponíveis para serem lidos quando um pacote é fechado
 
-uint8_t chavePublicaRemotaBuf[65] = {0};
+uint8_t chavePublicaRemotaBuf[65] = {0}; //Buffer chave Publica remota
 br_ec_public_key chavePublicaRemota = 	{
 											.curve = BR_EC_secp256r1,
 											.q = chavePublicaRemotaBuf,
 											.qlen = sizeof(chavePublicaRemotaBuf)
 										};
-uint64_t contadorMensagensTX = 0;
+uint64_t contadorMensagensTX = 0; //Conta o fluxo de mensagens. Importante para geração da IVs.
 
 
 void UART0_SERIAL_RX_TX_IRQHANDLER(void)
+/*Interrupçao UART0*/
 {
 	static uint8_t cont = 0;
 	static uint8_t recebendoPacote = 0;
@@ -79,7 +81,7 @@ void UART0_SERIAL_RX_TX_IRQHANDLER(void)
     			cont++;
     			if(rxSerialBuffer[cont - 1] == 0x03)
 				{
-					qtDadosDisponiveis = cont-2; //Retira 0x02 e 0x03 da contagem
+					qtDadosDisponiveis = cont;
 					cont = 0;
 					recebendoPacote = 0;
 				}
@@ -96,17 +98,22 @@ void UART0_SERIAL_RX_TX_IRQHANDLER(void)
 }
 
 size_t DadosProntosParaLeitura()
+/*Diz o tamanho do quadro que está disponível para leitura*/
 {
 	return qtDadosDisponiveis;
 }
 
 size_t LeDadosSerial(uint8_t **output)
+/*Retorna um ponteiro para o quadro recebido na UART0 (Caso haja algum)
+ * output: Ponteiro retornado (não precisa ser deslocado (buffer estático)
+ * return: tamanho do quadro recebido
+ * */
 {
 	size_t qty = 0;
 
 	if(qtDadosDisponiveis)
 	{
-		*output = &rxSerialBuffer[1]; //salva quantos bytes foram lidos
+		*output = &rxSerialBuffer[0]; //salva quantos bytes foram lidos
 		qty = qtDadosDisponiveis;
 		qtDadosDisponiveis = 0;
 	}
@@ -120,6 +127,7 @@ size_t LeDadosSerial(uint8_t **output)
 }
 
 void UART4_SERIAL_RX_TX_IRQHANDLER(void)
+/*Interrupção UART4 (NÃO ESTÁ SENDO UTILZADO*/
 {
     uint8_t data;
 
@@ -133,6 +141,7 @@ void UART4_SERIAL_RX_TX_IRQHANDLER(void)
 }
 
 char *hex_array_to_string(uint8_t *in, uint8_t len)
+/*Função auxiliar para transformar um binário HEXADECIMAL em String*/
 {
 	if(in == NULL || len == 0)
 		return NULL;
@@ -159,6 +168,7 @@ char *hex_array_to_string(uint8_t *in, uint8_t len)
 }
 
 int keygen_ec(int curve, Chave *ch)
+/*Gera um par de chaves(publica e privada) para a curva selecionada*/
 {
     const char *seeder_name;
     size_t length;
@@ -200,15 +210,17 @@ int keygen_ec(int curve, Chave *ch)
 
 
 int ComputeSharedSecret(br_ec_private_key *pvKey, br_ec_public_key *pbKey, uint8_t *secret)
+/*Retorna o segredo da curva eliptica BR_EC_secp256r1
+ *
+ * pvKey: CHAVE PRIVADA
+ * pbKey: CHAVE PUBLICA
+ * secret: Secredo compartilhado calculado
+ * return: 0 = segredo gerado com sucesso, -1 = erro
+ * */
 {
 	const br_ec_impl *ec_implementation = br_ec_get_default();
 
 	br_ec_public_key tmp = *pbKey;
-//	if (ec_implementation->mul(tmp.q, tmp.qlen, pvKey->x, pvKey->xlen, BR_EC_secp256r1))
-//		memcpy(secret, tmp.q, 33);
-//	else
-//		return -1;
-//
 	ec_implementation->mul(tmp.q, tmp.qlen, pvKey->x, pvKey->xlen, BR_EC_secp256r1);
 
 	if (tmp.qlen == 65) {
@@ -223,6 +235,7 @@ int ComputeSharedSecret(br_ec_private_key *pvKey, br_ec_public_key *pbKey, uint8
 
 
 void delay(void)
+/*Função bloqueante de Delay...*/
 {
     volatile uint32_t i = 0;
     for (i = 0; i < 8000; ++i)
@@ -232,6 +245,14 @@ void delay(void)
 }
 
 uint8_t* apply_pkcs7_padding(const uint8_t *input, size_t len, size_t *padded_len_out)
+/* Aplica PADDING PKCS7 em um vertor de entrada
+ * input: dados que se deseja codificar para (8 bits)
+ * len_input: tamanho dos dados de entrada
+ * len_out: tamanho dos dados decodificados na saida
+ * return: ponteiro para dados codificados em 7 bits alocados dinamicamente (deve
+ * ser desalocado manualmente após uso)
+ *
+ * */
 {
     size_t pad_len = 16 - (len % 16);
     size_t padded_len = len + pad_len;
@@ -246,7 +267,43 @@ uint8_t* apply_pkcs7_padding(const uint8_t *input, size_t len, size_t *padded_le
     return padded;
 }
 
+/**
+ * Remove o padding PKCS#7 de um buffer e retorna uma nova área de memória com os dados originais.
+ *
+ * @param input        Dados de entrada com padding.
+ * @param padded_len   Tamanho total dos dados (incluindo padding).
+ * @param output_len   Ponteiro para armazenar o tamanho dos dados sem o padding.
+ * @return             Ponteiro para nova região com dados decodificados, ou NULL se o padding for inválido.
+ *                     O ponteiro retornado deve ser liberado com free().
+ */
+uint8_t* remove_pkcs7_padding(const uint8_t *input, size_t padded_len, size_t *output_len) {
+    if (padded_len == 0 || input == NULL || output_len == NULL) return NULL;
+
+    uint8_t pad_len = input[padded_len - 1];
+    if (pad_len == 0 || pad_len > 16 || pad_len > padded_len) return NULL;
+
+    // Verifica se todos os bytes de padding estão corretos
+    for (size_t i = 0; i < pad_len; i++) {
+        if (input[padded_len - 1 - i] != pad_len) return NULL;
+    }
+
+    size_t unpadded_len = padded_len - pad_len;
+    uint8_t *output = malloc(unpadded_len);
+    if (!output) return NULL;
+
+    memcpy(output, input, unpadded_len);
+    *output_len = unpadded_len;
+    return output;
+}
+
+
 uint8_t* CodificaDados7bits(const uint8_t *input, size_t len_input, size_t *len_out)
+/* Codifica um vetor de uint8 em um outro vetor de 7bits com o msb setado.
+ * input: dados que se deseja codificar para (8 bits)
+ * len_input: tamanho dos dados de entrada
+ * len_out: tamanho dos dados decodificados na saida
+ * return: ponteiro para dados codificados em 7 bits alocados dinamicamente (desalocar manualmente)
+ * */
 {
 	uint8_t *output = NULL;
 	*len_out = ((len_input*8) % 7) ? ((len_input*8) / 7) + 1: (len_input*8) / 7;
@@ -297,6 +354,12 @@ uint8_t* CodificaDados7bits(const uint8_t *input, size_t len_input, size_t *len_
 }
 
 uint8_t* DecodificaDados7bits(const uint8_t* input, size_t len_input, size_t* len_out)
+/* Descodifica o vetor de 7bits (com o msb setado) para um vetor tradicional de 8bits
+ * input: dados que se deseja retornar para o formato original (8 bits)
+ * len_input: tamanho dos dados de entrada
+ * len_out: tamanho dos dados decodificados na saida
+ * return: ponteiro para dados decodificados alocados dinamicamente (desalocar manualmente)
+ * */
 {
     if (!input || len_input == 0 || !len_out) return NULL;
 
@@ -318,7 +381,6 @@ uint8_t* DecodificaDados7bits(const uint8_t* input, size_t len_input, size_t* le
     {
     	output[out_index] = input[in_index] << shift;
     	output[out_index] = CLEAR_LSB_N_BITS(output[out_index], shift);
-    	//uint8_t aux = (input[in_index -1] & 0b01111111) >> (7-shift) ;
     	output[out_index] |= (input[in_index -1] & 0b01111111) >> (7-shift);
     	in_index--;
     	if((shift + 1) % 8)
@@ -337,6 +399,12 @@ uint8_t* DecodificaDados7bits(const uint8_t* input, size_t len_input, size_t* le
 }
 
 uint8_t *CriaQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
+/* Cria quadro padronizado de  comunicação com os dados de entrada
+ * input: dados que se deseja criar o quadro
+ * q: tamanho dos dados de entrada
+ * qOutput: tamanho dos dados codificados na saida
+ * return: ponteiro para dados codificados alocados dinamicamente (desalocar manualmente)
+ * */
 {
 	uint8_t *output = NULL, *codificado = NULL;
 	size_t qOut = 0;
@@ -362,6 +430,18 @@ uint8_t *CriaQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
 	free(codificado);
 
 	return output;
+}
+
+uint8_t *ObtemDadosQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
+/* Retira os dados do quadro padronizado de comunicação (já retirando o header)
+ * input: quadro codificado com o header
+ * q: tamanho total do quadro codificado
+ * qOutput: tamanho dos dados decodificados
+ * return: ponteiro para dados decodificados alocados dinamicamente (desalocar manualmente)
+ * */
+{
+	uint8_t *pacoteDecodificado = DecodificaDados7bits(&input[1], q-2, qOutput);
+	return pacoteDecodificado;
 }
 
 
@@ -424,9 +504,10 @@ int main(void) {
 	if(!tamPacoteRx)
 		while(true); //Erro
 
-	pacoteDecodificado = DecodificaDados7bits(pacoteRecebido, tamPacoteRx, &tamPacoteDecodifcado);
+	pacoteDecodificado = ObtemDadosQuadroCodificado(pacoteRecebido, tamPacoteRx, &tamPacoteDecodifcado);
+
 	if(tamPacoteDecodifcado != 65)
-		while(true); //Erro
+		while(true); //Erro (não bate com tamanho da chave pública)
 
 	memcpy(chavePublicaRemotaBuf, pacoteDecodificado, tamPacoteDecodifcado);
 	free(pacoteDecodificado); //Libera a memória alocada para o pacote
@@ -486,33 +567,63 @@ int main(void) {
 			/*Cria pacote codificado em 7 bits e adiciona headers de comunicação*/
 			pacoteEnviado = CriaQuadroCodificado(contador_encrypted, tam_contador_encrypted, &tamPacoteTx);
 
-			/*Envia */
+			/*Envia Desafio*/
 			UART_WriteBlocking(UART0, pacoteEnviado, tamPacoteTx);
+
+			/*Desaloca memorias*/
 			free(encrypted);
 			free(pacoteEnviado);
 			free(contador_encrypted);
 			free(paddedPlain);
+
 			contadorMensagensTX++;
 
+			while(!DadosProntosParaLeitura()); //Espera para receber a Solucao do Desafio
 
-//			UART_WriteBlocking(UART0, paddedPlain, padded_len_out);
-//			UART_WriteBlocking(UART0, encrypted, padded_len_out);
-//			UART_WriteBlocking(UART0, encrypted, sizeof(encrypted));
+			tamPacoteRx = LeDadosSerial(&pacoteRecebido);
 
-			/*Libera a memoria alocada*/
-//			free(paddedPlain);
-//			free(encrypted);
+			if(!tamPacoteRx)
+				while(true); //Erro
 
-//			br_aes_small_cbcdec_keys ctx_dec;
-//			uint8_t iv_dec[16];
-//			memcpy(iv_dec, iv_original, 16); // reset IV
-//			memcpy(decrypted, encrypted, 16);
-//			br_aes_small_cbcdec_init(&ctx_dec, key, sizeof(key));
-//			br_aes_small_cbcdec_run(&ctx_dec, iv_dec, decrypted, 16);
+			pacoteDecodificado = ObtemDadosQuadroCodificado(pacoteRecebido, tamPacoteRx, &tamPacoteDecodifcado);
 
+			if(!tamPacoteDecodifcado)
+				while(true); //Erro Decodificacao
+
+			/* Salva Contador de Mensagens e solucao criptografada*/
+			size_t tamSolucaoCripto = tamPacoteDecodifcado - sizeof(uint64_t);
+			uint8_t *solucaoCripto  = malloc(tamSolucaoCripto);
+
+			if(solucaoCripto == NULL)
+				while(true);
+
+			memcpy(&contadorMensagensTX, pacoteDecodificado, sizeof(uint64_t)); //Salva Contador
+			memcpy(solucaoCripto, &pacoteDecodificado[sizeof(uint64_t)], tamSolucaoCripto); //Salva Mensagem
+			free(pacoteDecodificado); //Libera a memória alocada para o pacote Decodificado
+
+			/* Atualiza INFO com o contador de Mensagens*/
+			memcpy(&info[10], &contadorMensagensTX, sizeof(contadorMensagensTX));
+
+			/* Produz IV */
+			br_hkdf_context hkdfSol;
+			br_hkdf_init(&hkdfSol, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
+			br_hkdf_inject(&hkdfSol, segredo1, sizeof(segredo1));
+			br_hkdf_flip(&hkdfSol);
+			br_hkdf_produce(&hkdfSol, info, sizeof(info), iv, sizeof(iv));
+
+			/* Descriptografa */
+			br_aes_small_cbcdec_keys ctx_dec;
+			br_aes_small_cbcdec_init(&ctx_dec, key, sizeof(key));
+			br_aes_small_cbcdec_run(&ctx_dec, iv, solucaoCripto, tamSolucaoCripto);
+
+			/* Retira Padding PKCS7*/
+			size_t tamSolucao = 0;
+			uint8_t *solucao = remove_pkcs7_padding(solucaoCripto, tamSolucaoCripto, &tamSolucao);
 			asm("NOP");
 			asm("NOP");
 			asm("NOP");
+			free(solucaoCripto);
+			free(solucao);
 
     	}
     	else
