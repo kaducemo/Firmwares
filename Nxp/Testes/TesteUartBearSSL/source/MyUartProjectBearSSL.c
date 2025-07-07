@@ -171,39 +171,52 @@ int keygen_ec(int curve, Chave *ch)
 /*Gera um par de chaves(publica e privada) para a curva selecionada*/
 {
     const char *seeder_name;
-    size_t length;
+    ch->ok = 1;
 
+    const br_ec_impl *impl = br_ec_get_default(); //Inicia contexto ECDHE
+
+    /*Inicia gerador de sememntes (ENTROPIA)*/
     br_prng_seeder seeder = br_prng_seeder_system(&seeder_name);
-
     if (seeder == NULL)
+	/*Erro. Não conseguiu iniciar o gerador de sementes (ENTROPIA)*/
     {
-//    	PRINTF("ERRO: sem fonte de RANDOM\n\r");
+
     	ch->ok = -1;
+    	memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
+    	return ch->ok;
     }
 
+    //Inicia Gerador Deterministico SHA256
     br_hmac_drbg_context rng;
     br_hmac_drbg_init(&rng, &br_sha256_vtable, NULL, 0);
-
     if (!seeder(&rng.vtable))
+	/*Erro. Não conseguiu iniciar o gerador detereministico SHA256*/
     {
-//    	PRINTF("Falha ao gerar funcao RANDOM\n\r");
     	ch->ok = -1;
+    	memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
+    	return ch->ok;
     }
 
-//    PRINTF("Nome da funcao Seeder: %s\n\r", seeder_name);
-
-    const br_ec_impl *impl = br_ec_get_default();
-
-    //Gera chave privada
-    ch->ok = (0 != br_ec_keygen( &rng.vtable, impl, &(ch->pvKey), ch->pvKey.x, curve));
-
-    length = br_ec_compute_pub(impl, &(ch->pbKey), ch->pbKey.q, &(ch->pvKey));
-
-    if (length == 0)
+    //Gera chave privada ECDHE
+    if (!br_ec_keygen( &rng.vtable, impl, &(ch->pvKey), ch->pvKey.x, curve))
+	/*Erro. Geracao da chave privada*/
     {
-//    	PRINTF("-ERRO: Curva nao suportada\n\r");
     	ch->ok = -1;
+		memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
+		return ch->ok;
+    }
+
+    //Gera chave publica ECDHE a partir da chave privada
+    if (!br_ec_compute_pub(impl, &(ch->pbKey), ch->pbKey.q, &(ch->pvKey)))
+    	/*Erro. Geracao da chave publica*/
+    {
+    	ch->ok = -1;
+    	memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
+    	return ch->ok;
 	}
+
+    //Limpa toda estrutura do gerador Deterministico
+    memset(&rng,0,sizeof(br_hmac_drbg_context));
 
     return ch->ok;
 }
@@ -469,16 +482,12 @@ int main(void) {
     uint8_t key[32] = {0};
 	uint8_t iv[16] = {0};
 	uint8_t *encrypted = NULL;
-	//uint8_t encrypted[16] = {0};
-	uint8_t decrypted[16] = {0};
-	//uint8_t plain[16] = "DESAFIO, DP40\0"; // 16 bytes
-	uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!"; // 16 bytes
-
+	uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!";
 	size_t tamPacoteRx = 0, tamPacoteTx = 0;
 	size_t tamPacoteDecodifcado = 0;
 
 
-    VOLTA:
+VOLTA:
     memset(chavePublicaRemotaBuf, 0, sizeof(chavePublicaRemotaBuf));
     memset(&chavesLocais, 0, sizeof(Chave));
     memset(segredo1, 0, sizeof(segredo1));
