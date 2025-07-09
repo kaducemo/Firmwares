@@ -30,6 +30,17 @@
 /*******************************************************************************
  * Code
  ******************************************************************************/
+
+// Tamanhos padrão para GCM
+#define GCM_IV_LEN   	12
+#define GCM_TAG_LEN  	16
+#define AES_KEY_LEN  	32  // AES-256
+#define ECDH_SEC_LEN 	65  //Tamanho do Secredo ECDH formato não compactado
+#define HKDF_INFO_LEN	18
+
+#define OK	1
+#define NOK 0
+
 #define CLEAR_MSB_N_BITS(byte, n) ((byte) & (255U >> n)) //Macros auxiliares
 #define CLEAR_LSB_N_BITS(byte, n) ((byte) & (255U << n))
 
@@ -45,7 +56,7 @@ typedef struct KeygenResult
 
 Chave chavesLocais, chavesRemotas; // Chaves Publicas e Privadas (locais e remotas)
 
-uint8_t segredo1[65] = {0}, segredo2[32] = {0}; //Gera Segredos para comparacao
+uint8_t segredo1[ECDH_SEC_LEN] = {0}, segredo2[32] = {0}; //Gera Segredos para comparacao
 
 uint8_t rxSerialBuffer[512] = {0}; //Buffer utilizado na porta serial
 size_t qtDadosDisponiveis = 0; //Diz quantos bytes estão disponíveis para serem lidos quando um pacote é fechado
@@ -56,7 +67,7 @@ br_ec_public_key chavePublicaRemota = 	{
 											.q = chavePublicaRemotaBuf,
 											.qlen = sizeof(chavePublicaRemotaBuf)
 										};
-uint64_t contadorMensagensTX = 0; //Conta o fluxo de mensagens. Importante para geração da IVs.
+uint64_t contadorMensagens = 0; //Conta o fluxo de mensagens. Importante para geração da IVs.
 
 
 void UART0_SERIAL_RX_TX_IRQHANDLER(void)
@@ -140,6 +151,18 @@ void UART4_SERIAL_RX_TX_IRQHANDLER(void)
     SDK_ISR_EXIT_BARRIER;
 }
 
+void secure_zero(void *v, size_t n)
+/* Esta a funcao limpa um buffer, retirando residuos da RAM de forma segura e nao
+ * otimizavel pelo compilador.
+ * @param v: vetor que se deseja limpar
+ * @param n: tanho desse vetor*/
+{
+    volatile uint8_t *p = (volatile uint8_t *)v;
+    while (n--) {
+        *p++ = 0;
+    }
+}
+
 char *hex_array_to_string(uint8_t *in, uint8_t len)
 /*Função auxiliar para transformar um binário HEXADECIMAL em String*/
 {
@@ -171,7 +194,7 @@ int keygen_ec(int curve, Chave *ch)
 /*Gera um par de chaves(publica e privada) para a curva selecionada*/
 {
     const char *seeder_name;
-    ch->ok = 1;
+    ch->ok = OK;
 
     const br_ec_impl *impl = br_ec_get_default(); //Inicia contexto ECDHE
 
@@ -181,7 +204,7 @@ int keygen_ec(int curve, Chave *ch)
 	/*Erro. Não conseguiu iniciar o gerador de sementes (ENTROPIA)*/
     {
 
-    	ch->ok = -1;
+    	ch->ok = NOK;
     	memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
     	return ch->ok;
     }
@@ -192,7 +215,7 @@ int keygen_ec(int curve, Chave *ch)
     if (!seeder(&rng.vtable))
 	/*Erro. Não conseguiu iniciar o gerador detereministico SHA256*/
     {
-    	ch->ok = -1;
+    	ch->ok = NOK;
     	memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
     	return ch->ok;
     }
@@ -201,7 +224,7 @@ int keygen_ec(int curve, Chave *ch)
     if (!br_ec_keygen( &rng.vtable, impl, &(ch->pvKey), ch->pvKey.x, curve))
 	/*Erro. Geracao da chave privada*/
     {
-    	ch->ok = -1;
+    	ch->ok = NOK;
 		memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
 		return ch->ok;
     }
@@ -210,7 +233,7 @@ int keygen_ec(int curve, Chave *ch)
     if (!br_ec_compute_pub(impl, &(ch->pbKey), ch->pbKey.q, &(ch->pvKey)))
     	/*Erro. Geracao da chave publica*/
     {
-    	ch->ok = -1;
+    	ch->ok = NOK;
     	memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
     	return ch->ok;
 	}
@@ -255,58 +278,6 @@ void delay(void)
     {
         __asm("NOP"); /* delay */
     }
-}
-
-uint8_t* apply_pkcs7_padding(const uint8_t *input, size_t len, size_t *padded_len_out)
-/* Aplica PADDING PKCS7 em um vertor de entrada
- * input: dados que se deseja codificar para (8 bits)
- * len_input: tamanho dos dados de entrada
- * len_out: tamanho dos dados decodificados na saida
- * return: ponteiro para dados codificados em 7 bits alocados dinamicamente (deve
- * ser desalocado manualmente após uso)
- *
- * */
-{
-    size_t pad_len = 16 - (len % 16);
-    size_t padded_len = len + pad_len;
-
-    uint8_t *padded = malloc(padded_len);
-    if (!padded) return NULL;
-
-    memcpy(padded, input, len);
-    memset(padded + len, (uint8_t)pad_len, pad_len);
-
-    *padded_len_out = padded_len;
-    return padded;
-}
-
-/**
- * Remove o padding PKCS#7 de um buffer e retorna uma nova área de memória com os dados originais.
- *
- * @param input        Dados de entrada com padding.
- * @param padded_len   Tamanho total dos dados (incluindo padding).
- * @param output_len   Ponteiro para armazenar o tamanho dos dados sem o padding.
- * @return             Ponteiro para nova região com dados decodificados, ou NULL se o padding for inválido.
- *                     O ponteiro retornado deve ser liberado com free().
- */
-uint8_t* remove_pkcs7_padding(const uint8_t *input, size_t padded_len, size_t *output_len) {
-    if (padded_len == 0 || input == NULL || output_len == NULL) return NULL;
-
-    uint8_t pad_len = input[padded_len - 1];
-    if (pad_len == 0 || pad_len > 16 || pad_len > padded_len) return NULL;
-
-    // Verifica se todos os bytes de padding estão corretos
-    for (size_t i = 0; i < pad_len; i++) {
-        if (input[padded_len - 1 - i] != pad_len) return NULL;
-    }
-
-    size_t unpadded_len = padded_len - pad_len;
-    uint8_t *output = malloc(unpadded_len);
-    if (!output) return NULL;
-
-    memcpy(output, input, unpadded_len);
-    *output_len = unpadded_len;
-    return output;
 }
 
 
@@ -440,6 +411,7 @@ uint8_t *CriaQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
 	output[(*qOutput)-1] = 0x03;
 
 	memcpy(&output[1], codificado, qOut);
+	secure_zero(codificado, qOut);
 	free(codificado);
 
 	return output;
@@ -457,6 +429,211 @@ uint8_t *ObtemDadosQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
 	return pacoteDecodificado;
 }
 
+uint8_t *RetiraDadosDeQuadroRecebido(uint8_t *dadosRx, size_t lenRx, uint8_t cripto, uint8_t *secret, uint64_t *contador, size_t *lenOut)
+/* Esta função retorna os dados de um quadro recebido. Esse quadro por padrão
+ * está codificado em 7 bits e possui header e ainda pode estar criptografado.
+ * Os dados retornados devem ser desalocados manualmente após seu uso.
+ * @param dadosRx(in): Dados recebidos e que devem ser desempacotados
+ * @param lenRx(in): tamanho do vetor dos dados Recebidos
+ * @param cripto(in): Diz se quadro recebido está criptografado (1 == Criptografado, 0 == Não criptografado).
+ * @param secret(in): (utilizado para criptografia) Segredo compartilhado gerado pelo ECDH
+ * @param contador(out): (utilizado para criptografia)É o contador de mensagens. Será atualizado a cada chamada.
+ * @param lenOut(out): tamanho do vetor de saída (dados empacotados)
+ * */
+{
+	uint8_t *output = NULL;
+	const char *salt_hkdf = "DATAPROM_SALT";
+	char info[HKDF_INFO_LEN] = {'D','A','T','A','S','E','C','R','E','T','\0','\0','\0','\0','\0','\0','\0','\0'};
+	uint8_t iv[GCM_IV_LEN] = {0}; // IV GCM 12 bytes
+	uint8_t key[AES_KEY_LEN] = {0}; //Chave GCM
+
+	if(cripto)
+	{
+		if( dadosRx != NULL && lenRx != 0 && contador != NULL && lenOut != NULL)
+		//Verifica integridade dos dados de entrada
+		{
+			size_t tamPacoteDecodifcado = 0;
+			uint8_t *pacoteDecodificado = ObtemDadosQuadroCodificado(dadosRx, lenRx, &tamPacoteDecodifcado);
+
+			if(!tamPacoteDecodifcado)
+				while(true); //Erro Decodificacao
+
+			/* Salva Contador de Mensagens e solucao criptografada*/
+			size_t tamSolucaoCripto = tamPacoteDecodifcado - sizeof(uint64_t) - GCM_TAG_LEN;
+			uint8_t *solucaoCripto  = malloc(tamSolucaoCripto);
+
+			if(solucaoCripto == NULL)
+				while(true);
+
+			memcpy(contador, pacoteDecodificado, sizeof(uint64_t)); //Salva Contador
+			memcpy(solucaoCripto, &pacoteDecodificado[sizeof(uint64_t)], tamSolucaoCripto); //Salva Mensagem
+
+			/* Atualiza INFO com o contador de Mensagens*/
+			memcpy(&info[sizeof(info) - sizeof(uint64_t)], contador, sizeof(uint64_t));
+
+			/* Produz Key Solucao*/
+			br_hkdf_context hkdfSolKey;
+			br_hkdf_init(&hkdfSolKey, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
+			br_hkdf_inject(&hkdfSolKey, secret, ECDH_SEC_LEN);
+			br_hkdf_flip(&hkdfSolKey);
+			br_hkdf_produce(&hkdfSolKey, info, sizeof(info), key, sizeof(key));
+
+			/* Produz IV Solucao*/
+			br_hkdf_context hkdfSolIV;
+			br_hkdf_init(&hkdfSolIV, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
+			br_hkdf_inject(&hkdfSolIV, secret, ECDH_SEC_LEN);
+			br_hkdf_flip(&hkdfSolIV);
+			br_hkdf_produce(&hkdfSolIV, info, sizeof(info), iv, sizeof(iv));
+
+			// Inicializa AES-GCM
+			br_aes_ct64_ctr_keys aes_ctx;
+			br_aes_ct64_ctr_init(&aes_ctx, key, AES_KEY_LEN);
+			br_gcm_context gcm;
+			br_gcm_init(&gcm, &aes_ctx.vtable, &br_ghash_ctmul64);
+
+			 // Prepara buffer de decifração (Retira tamanho contador e TAG
+			size_t tamSolucao = tamSolucaoCripto;
+			*lenOut = tamSolucao;
+			output = malloc(tamSolucao);
+			if (!output) while(true);
+
+			// Copia os dados cifrados para saída, pois será decifrado in-place
+			memcpy(output, solucaoCripto, tamSolucao);
+
+			// Processo GCM
+			br_gcm_reset(&gcm, iv, GCM_IV_LEN);
+			br_gcm_aad_inject(&gcm, NULL, 0); // sem AAD
+			br_gcm_run(&gcm, 0, output, tamSolucao); // decifra in-place
+			br_gcm_flip(&gcm);
+
+			// Verifica TAG
+			uint8_t tag_calculada[GCM_TAG_LEN];
+			br_gcm_get_tag(&gcm, tag_calculada);
+
+			if (memcmp(&pacoteDecodificado[tamPacoteDecodifcado-GCM_TAG_LEN], tag_calculada, GCM_TAG_LEN) != 0) {
+				// TAG inválida → dados corrompidos ou adulterados
+				secure_zero(output, tamSolucao);
+				free(output);
+				output =  NULL;
+				*lenOut = 0;
+			}
+
+			secure_zero(pacoteDecodificado, tamPacoteDecodifcado);
+			secure_zero(solucaoCripto, tamSolucaoCripto);
+			free(pacoteDecodificado); //Libera a memória alocada
+			free(solucaoCripto);
+		}
+	}
+	else
+	{
+		if(dadosRx != NULL && lenRx != 0)
+		//Verifica integridade dos dados de entrada
+		{
+			//Gera Quadro sem header e retira codificação 7 bits
+			output = ObtemDadosQuadroCodificado(dadosRx, lenRx, lenOut);
+		}
+	}
+	return output;
+}
+
+uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8_t *secret ,uint64_t *contador, size_t *lenOut)
+/*Esta função retorna um quadro pronto para ser transmitido. Esses dados podem ou não serem criptografados. *
+ * O quadro retornado deve ser desalocado manualmente após seu uso.
+ * @param dados(in): Dados para serem empacotados
+ * @param lenIn(in): tamanho do vetor de dados de entrada
+ * @param cripto(in): Diz se dados vão ou não serem criptografados (0 não criptografa, qualquer outro valor criptografa)
+ * @param secret(in): (utilizado para criptografia)Segredo (alta entropia) gerado por ECDH
+ * @param contador(in): (utilizado para criptografia)É o contador de mensagens. Não deve nunca se repetir
+ * @param lenOut(out): tamanho do vetor de saída (dados empacotados)
+ * */
+
+{
+	uint8_t *output = NULL;
+	const char *salt_hkdf = "DATAPROM_SALT";
+	char info[HKDF_INFO_LEN] = {'D','A','T','A','S','E','C','R','E','T','\0','\0','\0','\0','\0','\0','\0','\0'};
+	uint8_t iv[GCM_IV_LEN] = {0}; // IV GCM 12 bytes
+	uint8_t key[AES_KEY_LEN] = {0}; //Chave GCM
+	uint8_t tag[GCM_TAG_LEN] = {0};
+	uint8_t *encrypted = NULL;
+
+
+	*lenOut = 0;
+
+	if(cripto)
+	// Vai criptografar
+	{
+		if(dados != NULL && lenIn != 0 && secret != NULL && contador != NULL)
+		//Verifica integridade dos dados de entrada
+		{
+			memcpy(&info[HKDF_INFO_LEN - sizeof(uint64_t)], contador, sizeof(uint64_t)); // Atualiza INFO a cada mensagem enviada
+
+			// Produz Key AES256-GCM
+			br_hkdf_context hkdfKey;
+			br_hkdf_init(&hkdfKey, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
+			br_hkdf_inject(&hkdfKey, secret, ECDH_SEC_LEN);
+			br_hkdf_flip(&hkdfKey);
+			br_hkdf_produce(&hkdfKey, info, sizeof(info), key, AES_KEY_LEN);	 //Produz Chave
+
+
+			// Produz IV GCM
+			br_hkdf_context hkdfIV;
+			br_hkdf_init(&hkdfIV, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
+			br_hkdf_inject(&hkdfIV, secret, ECDH_SEC_LEN);
+			br_hkdf_flip(&hkdfIV);
+			br_hkdf_produce(&hkdfIV, info, sizeof(info), iv, sizeof(iv));
+
+			//Inicializa contexto AES-GCM
+			br_gcm_context gcm;
+			br_aes_ct64_ctr_keys aes_ctx;
+			br_aes_ct64_ctr_init(&aes_ctx, key, AES_KEY_LEN);
+			br_gcm_init(&gcm, &aes_ctx.vtable, &br_ghash_ctmul64);
+			encrypted = malloc(lenIn);
+			if(encrypted == NULL)
+				return output;
+
+			//Criptografa Dados
+			memcpy(encrypted, dados, lenIn);
+			br_gcm_reset(&gcm, iv, GCM_IV_LEN);
+			br_gcm_aad_inject(&gcm, NULL, 0); // nenhum AAD, se desejar pode adicionar depois
+			br_gcm_run(&gcm, 1, encrypted, lenIn);
+			br_gcm_flip(&gcm);
+			br_gcm_get_tag(&gcm, tag);
+
+			//Junta Dados, Contador e TAG no Quadro: [Contador de Mensagens(LSB) | Dados Cript | TAG (MSB)]
+			size_t lenQuadro = sizeof(uint64_t) + lenIn + GCM_TAG_LEN;
+			uint8_t *quadro = malloc(lenQuadro);
+			if (!quadro) { //Erro de alocacao
+				secure_zero(encrypted, lenIn);
+				free(encrypted);
+				return output;
+			}
+			memcpy(quadro, contador, sizeof(uint64_t));
+			memcpy(&quadro[sizeof(uint64_t)], encrypted, lenIn);
+			memcpy(&quadro[sizeof(uint64_t) + lenIn], tag, GCM_TAG_LEN);
+
+			//Gera Quadro codificado com 7bits e Headers
+			output = CriaQuadroCodificado(quadro, lenQuadro, lenOut);
+
+			//Libera alocacoes intermediarias
+			secure_zero(encrypted, lenIn);
+			secure_zero(quadro, lenQuadro);
+			free(encrypted);
+			free(quadro);
+
+		}
+	}
+	else
+	// Sem criptografia
+	{
+		if(dados != NULL && lenIn != 0)
+		//Verifica integridade dos dados de entrada
+		{
+			//Gera Quadro codificado com 7bits e Headers
+			output = CriaQuadroCodificado(dados, lenIn, lenOut);
+		}
+	}
+	return output;
+}
 
 
 /* TODO: insert other definitions and declarations here. */
@@ -465,7 +642,6 @@ uint8_t *ObtemDadosQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
  * @brief   Application entry point.
  */
 int main(void) {
-
 
     /* Init board hardware. */
     BOARD_InitBootPins();
@@ -476,25 +652,14 @@ int main(void) {
     BOARD_InitDebugConsole();
 #endif
 
-    const char *salt_hkdf = "DATAPROM_SALT";
-    char info[18] = {'D','A','T','A','S','E','C','R','E','T','\0','\0','\0','\0','\0','\0','\0','\0'};
-
-    uint8_t key[32] = {0};
-	uint8_t iv[16] = {0};
-	uint8_t *encrypted = NULL;
 	uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!";
 	size_t tamPacoteRx = 0, tamPacoteTx = 0;
 	size_t tamPacoteDecodifcado = 0;
-
 
 VOLTA:
     memset(chavePublicaRemotaBuf, 0, sizeof(chavePublicaRemotaBuf));
     memset(&chavesLocais, 0, sizeof(Chave));
     memset(segredo1, 0, sizeof(segredo1));
-
-    memset(key, 0, sizeof(key));
-    memset(iv, 0, sizeof(iv));
-
 
     //Aloca buffers para chaves remotas e Locais
 	chavesLocais.pvKey.x = chavesLocais.pvBuf;
@@ -507,133 +672,61 @@ VOLTA:
 	uint8_t *pacoteRecebido;
 	uint8_t *pacoteEnviado;
 	uint8_t *pacoteDecodificado;
+
 	tamPacoteRx = LeDadosSerial(&pacoteRecebido);
+	if(!tamPacoteRx)	while(true); //Erro
 
-
-	if(!tamPacoteRx)
-		while(true); //Erro
-
-	pacoteDecodificado = ObtemDadosQuadroCodificado(pacoteRecebido, tamPacoteRx, &tamPacoteDecodifcado);
-
-	if(tamPacoteDecodifcado != 65)
-		while(true); //Erro (não bate com tamanho da chave pública)
+	pacoteDecodificado = RetiraDadosDeQuadroRecebido(pacoteRecebido, tamPacoteRx, 0, NULL, NULL, &tamPacoteDecodifcado);
+	if(tamPacoteDecodifcado != 65)	while(true); //Erro (não bate com tamanho da chave pública)
 
 	memcpy(chavePublicaRemotaBuf, pacoteDecodificado, tamPacoteDecodifcado);
+	secure_zero(pacoteDecodificado, tamPacoteDecodifcado);
 	free(pacoteDecodificado); //Libera a memória alocada para o pacote
 
-
-    if(keygen_ec(BR_EC_secp256r1, &chavesLocais) == 1) // Gera chaves Locais
+    if(keygen_ec(BR_EC_secp256r1, &chavesLocais) == 1) // Gera chaves Locais (Publica e Privada
 	{
+    	/* == Enviando a Chave Publica  == */
 
-    	pacoteEnviado = CriaQuadroCodificado(chavesLocais.pbKey.q, chavesLocais.pbKey.qlen, &tamPacoteTx);
+    	// Empacota Chave publica sem Criptografia
+    	pacoteEnviado = GeraQuadroParaEnvio(chavesLocais.pbKey.q, chavesLocais.pbKey.qlen, 0,NULL ,NULL, &tamPacoteTx);
+    	if(pacoteEnviado == NULL || tamPacoteTx == 0)	while(true);
 
+    	// Envia a Chave publica
     	UART_WriteBlocking(UART0, pacoteEnviado, tamPacoteTx);
+
+    	// Desaloca o Pacote
+    	secure_zero(pacoteEnviado, tamPacoteTx);
     	free(pacoteEnviado);
 
-    	if(!ComputeSharedSecret(&chavesLocais.pvKey, &chavesRemotas.pbKey, segredo1))
+    	if(!ComputeSharedSecret(&chavesLocais.pvKey, &chavesRemotas.pbKey, segredo1)) //Gera o Segredo Compartilhado
     	{
+    		/* == Enviando o Desafio == */
 
-    		memcpy(&info[10], &contadorMensagensTX, sizeof(contadorMensagensTX)); // Atualiza INFO a cada mensagem enviada
+			//Cria um quadro criptografado contendo o Desafio
+			pacoteEnviado = GeraQuadroParaEnvio(plain, sizeof(plain), 1, segredo1, &contadorMensagens, &tamPacoteTx);
 
-    		// Produz Key
-			br_hkdf_context hkdfKey;
-			br_hkdf_init(&hkdfKey, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
-			br_hkdf_inject(&hkdfKey, segredo1, sizeof(segredo1));
-			br_hkdf_flip(&hkdfKey);
-			br_hkdf_produce(&hkdfKey, info, sizeof(info)- sizeof(contadorMensagensTX), key, sizeof(key));	 //Produz Chave
-
-
-			//Produz IV
-			br_hkdf_context hkdfIV;
-			br_hkdf_init(&hkdfIV, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
-			br_hkdf_inject(&hkdfIV, segredo1, sizeof(segredo1));
-			br_hkdf_flip(&hkdfIV);
-			br_hkdf_produce(&hkdfIV, info, sizeof(info), iv, sizeof(iv));
-
-			uint8_t iv_original[16] = {0};
-			memcpy(iv_original, iv, 16); // salva o IV original
-
-			size_t padded_len_out = 0;
-			uint8_t *paddedPlain = apply_pkcs7_padding(plain, sizeof(plain), &padded_len_out);
-
-			br_aes_small_cbcenc_keys  ctx_enc;
-			br_aes_small_cbcenc_init(&ctx_enc, key, sizeof(key));
-			encrypted = malloc(padded_len_out);
-			if(encrypted == NULL)
-				while(true);
-
-			memcpy(encrypted, paddedPlain, padded_len_out);
-
-			br_aes_small_cbcenc_run(&ctx_enc, iv, encrypted, padded_len_out); //Aqui IV será modificado
-
-			/*Anexa iterador ao quadro codificado*/
-			size_t tam_contador_encrypted = sizeof(contadorMensagensTX) + padded_len_out;
-			uint8_t *contador_encrypted = malloc(tam_contador_encrypted); // Aloca memória para adicionar Iterador aos dados criptgrafados
-			memcpy(contador_encrypted, &contadorMensagensTX, sizeof(contadorMensagensTX)); //Anexa contador Codificado no inicio da mensagem
-			memcpy(&contador_encrypted[sizeof(contadorMensagensTX)], encrypted, padded_len_out); //Anexa Dados Encriptados
-
-
-			/*Cria pacote codificado em 7 bits e adiciona headers de comunicação*/
-			pacoteEnviado = CriaQuadroCodificado(contador_encrypted, tam_contador_encrypted, &tamPacoteTx);
-
-			/*Envia Desafio*/
+			/*Envia o Desafio*/
 			UART_WriteBlocking(UART0, pacoteEnviado, tamPacoteTx);
+			contadorMensagens++;
 
-			/*Desaloca memorias*/
-			free(encrypted);
+			/*Desaloca pacote*/
+			secure_zero(pacoteEnviado, tamPacoteTx);
 			free(pacoteEnviado);
-			free(contador_encrypted);
-			free(paddedPlain);
 
-			contadorMensagensTX++;
+			/* == Recebe a Solução == */
 
+			//Espera para receber a Solucao do Desafio
 			while(!DadosProntosParaLeitura()); //Espera para receber a Solucao do Desafio
-
 			tamPacoteRx = LeDadosSerial(&pacoteRecebido);
+			if(!tamPacoteRx)	while(true); //Erro
 
-			if(!tamPacoteRx)
-				while(true); //Erro
+			//Decifra pacote da solucão
+			pacoteDecodificado = RetiraDadosDeQuadroRecebido(pacoteRecebido, tamPacoteRx, 1, segredo1, &contadorMensagens, &tamPacoteDecodifcado);
+			if(!tamPacoteDecodifcado)	while(true); //Erro Decodificacao
 
-			pacoteDecodificado = ObtemDadosQuadroCodificado(pacoteRecebido, tamPacoteRx, &tamPacoteDecodifcado);
-
-			if(!tamPacoteDecodifcado)
-				while(true); //Erro Decodificacao
-
-			/* Salva Contador de Mensagens e solucao criptografada*/
-			size_t tamSolucaoCripto = tamPacoteDecodifcado - sizeof(uint64_t);
-			uint8_t *solucaoCripto  = malloc(tamSolucaoCripto);
-
-			if(solucaoCripto == NULL)
-				while(true);
-
-			memcpy(&contadorMensagensTX, pacoteDecodificado, sizeof(uint64_t)); //Salva Contador
-			memcpy(solucaoCripto, &pacoteDecodificado[sizeof(uint64_t)], tamSolucaoCripto); //Salva Mensagem
-			free(pacoteDecodificado); //Libera a memória alocada para o pacote Decodificado
-
-			/* Atualiza INFO com o contador de Mensagens*/
-			memcpy(&info[10], &contadorMensagensTX, sizeof(contadorMensagensTX));
-
-			/* Produz IV */
-			br_hkdf_context hkdfSol;
-			br_hkdf_init(&hkdfSol, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
-			br_hkdf_inject(&hkdfSol, segredo1, sizeof(segredo1));
-			br_hkdf_flip(&hkdfSol);
-			br_hkdf_produce(&hkdfSol, info, sizeof(info), iv, sizeof(iv));
-
-			/* Descriptografa */
-			br_aes_small_cbcdec_keys ctx_dec;
-			br_aes_small_cbcdec_init(&ctx_dec, key, sizeof(key));
-			br_aes_small_cbcdec_run(&ctx_dec, iv, solucaoCripto, tamSolucaoCripto);
-
-			/* Retira Padding PKCS7*/
-			size_t tamSolucao = 0;
-			uint8_t *solucao = remove_pkcs7_padding(solucaoCripto, tamSolucaoCripto, &tamSolucao);
-			asm("NOP");
-			asm("NOP");
-			asm("NOP");
-			free(solucaoCripto);
-			free(solucao);
-
+			/*Desaloca solucao*/
+			secure_zero(pacoteDecodificado, tamPacoteDecodifcado);
+			free(pacoteDecodificado);
     	}
     	else
     	{
