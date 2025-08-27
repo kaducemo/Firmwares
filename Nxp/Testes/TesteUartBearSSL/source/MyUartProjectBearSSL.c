@@ -24,6 +24,9 @@
 #include "fsl_debug_console.h"
 #include "bearssl.h"
 #include "fsl_rnga.h"
+#include "PubKey.h"
+#include "PrvKey.h"
+#include "PSKLib.h"
 
 
 /* TODO: insert other include files here. */
@@ -35,6 +38,8 @@
 #define GCM_IV_LEN   	12
 #define GCM_TAG_LEN  	16
 #define AES_KEY_LEN  	32  // AES-256
+
+
 #define ECDH_SEC_LEN 	65  //Tamanho do Secredo ECDH formato não compactado
 #define HKDF_INFO_LEN	18
 
@@ -45,28 +50,8 @@
 #define CLEAR_LSB_N_BITS(byte, n) ((byte) & (255U << n))
 
 
-typedef struct KeygenResult
-{
-    uint8_t pvBuf[BR_EC_KBUF_PRIV_MAX_SIZE];
-    uint8_t pbBuf[BR_EC_KBUF_PUB_MAX_SIZE];
-    br_ec_private_key pvKey;
-    br_ec_public_key pbKey;
-    int ok;
-}Chave;
-
-Chave chavesLocais, chavesRemotas; // Chaves Publicas e Privadas (locais e remotas)
-
-uint8_t segredo1[ECDH_SEC_LEN] = {0}, segredo2[32] = {0}; //Gera Segredos para comparacao
-
 uint8_t rxSerialBuffer[512] = {0}; //Buffer utilizado na porta serial
 size_t qtDadosDisponiveis = 0; //Diz quantos bytes estão disponíveis para serem lidos quando um pacote é fechado
-
-uint8_t chavePublicaRemotaBuf[65] = {0}; //Buffer chave Publica remota
-br_ec_public_key chavePublicaRemota = 	{
-											.curve = BR_EC_secp256r1,
-											.q = chavePublicaRemotaBuf,
-											.qlen = sizeof(chavePublicaRemotaBuf)
-										};
 uint64_t contadorMensagens = 0; //Conta o fluxo de mensagens. Importante para geração da IVs.
 
 
@@ -190,58 +175,78 @@ char *hex_array_to_string(uint8_t *in, uint8_t len)
 	return out;
 }
 
-int keygen_ec(int curve, Chave *ch)
+
+int keygen_ec(int curve, PrvKey *prKey, PubKey *pbKey)
 /*Gera um par de chaves(publica e privada) para a curva selecionada*/
 {
     const char *seeder_name;
-    ch->ok = OK;
+
+    prKey->ok = OK;
+    pbKey->ok = OK;
 
     const br_ec_impl *impl = br_ec_get_default(); //Inicia contexto ECDHE
 
     /*Inicia gerador de sememntes (ENTROPIA)*/
     br_prng_seeder seeder = br_prng_seeder_system(&seeder_name);
+
     if (seeder == NULL)
 	/*Erro. Não conseguiu iniciar o gerador de sementes (ENTROPIA)*/
     {
+    	prKey->ok = NOK;
+		pbKey->ok = NOK;
 
-    	ch->ok = NOK;
-    	memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
-    	return ch->ok;
+		memset(prKey,0,sizeof(PrvKey));
+		memset(pbKey,0,sizeof(PubKey));
+
+    	return NOK;
     }
 
     //Inicia Gerador Deterministico SHA256
     br_hmac_drbg_context rng;
     br_hmac_drbg_init(&rng, &br_sha256_vtable, NULL, 0);
+
     if (!seeder(&rng.vtable))
 	/*Erro. Não conseguiu iniciar o gerador detereministico SHA256*/
     {
-    	ch->ok = NOK;
-    	memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
-    	return ch->ok;
+    	prKey->ok = NOK;
+		pbKey->ok = NOK;
+
+		memset(prKey,0,sizeof(PrvKey));
+		memset(pbKey,0,sizeof(PubKey));
+
+		return NOK;
     }
 
     //Gera chave privada ECDHE
-    if (!br_ec_keygen( &rng.vtable, impl, &(ch->pvKey), ch->pvKey.x, curve))
+    if (!br_ec_keygen( &rng.vtable, impl, &(prKey->pvKey), prKey->pvKey.x, curve))
 	/*Erro. Geracao da chave privada*/
     {
-    	ch->ok = NOK;
-		memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
-		return ch->ok;
+    	prKey->ok = NOK;
+		pbKey->ok = NOK;
+
+		memset(prKey,0,sizeof(PrvKey));
+		memset(pbKey,0,sizeof(PubKey));
+
+		return NOK;
     }
 
     //Gera chave publica ECDHE a partir da chave privada
-    if (!br_ec_compute_pub(impl, &(ch->pbKey), ch->pbKey.q, &(ch->pvKey)))
+    if (!br_ec_compute_pub(impl, &(pbKey->pbKey), pbKey->pbKey.q, &(prKey->pvKey)))
     	/*Erro. Geracao da chave publica*/
     {
-    	ch->ok = NOK;
-    	memset(ch,0,sizeof(Chave)); //Limpa toda estrutura de chaves antes de retornar
-    	return ch->ok;
+    	prKey->ok = NOK;
+		pbKey->ok = NOK;
+
+		memset(prKey,0,sizeof(PrvKey));
+		memset(pbKey,0,sizeof(PubKey));
+
+		return NOK;
 	}
 
     //Limpa toda estrutura do gerador Deterministico
     memset(&rng,0,sizeof(br_hmac_drbg_context));
 
-    return ch->ok;
+    return OK;
 }
 
 
@@ -636,12 +641,32 @@ uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8
 }
 
 
+void TestePSK()
+{
+	asm("NOP");
+	asm("NOP");
+	char *i = psk_get(0);
+	volatile char a = 0;
+	a = *i;
+	i++;
+	a = *i;
+	i++;
+	a = *i;
+
+}
+
+
 /* TODO: insert other definitions and declarations here. */
 
 /*
  * @brief   Application entry point.
  */
 int main(void) {
+
+	PrvKey *chaveLocalPrivada = NULL;
+	PubKey *chaveLocalPublica = NULL, *chaveRemotaPublica = NULL;
+
+	uint8_t segredo1[ECDH_SEC_LEN] = {0}; //Gera Segredos para comparacao
 
     /* Init board hardware. */
     BOARD_InitBootPins();
@@ -652,20 +677,29 @@ int main(void) {
     BOARD_InitDebugConsole();
 #endif
 
+    TestePSK();
 	uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!";
 	size_t tamPacoteRx = 0, tamPacoteTx = 0;
 	size_t tamPacoteDecodifcado = 0;
 
 VOLTA:
-    memset(chavePublicaRemotaBuf, 0, sizeof(chavePublicaRemotaBuf));
-    memset(&chavesLocais, 0, sizeof(Chave));
+
+	if (chaveLocalPrivada != NULL)		Destroy_PrvKey(chaveLocalPrivada);
+	chaveLocalPrivada = New_PrvKey();
+
+	if (chaveLocalPublica != NULL)		Destroy_PubKey(chaveLocalPublica);
+	chaveLocalPublica = New_PubKey();
+
+	if (chaveRemotaPublica != NULL)		Destroy_PubKey(chaveRemotaPublica);
+	chaveRemotaPublica = New_PubKey();
+
     memset(segredo1, 0, sizeof(segredo1));
 
-    //Aloca buffers para chaves remotas e Locais
-	chavesLocais.pvKey.x = chavesLocais.pvBuf;
-	chavesLocais.pbKey.q = chavesLocais.pbBuf;
 
-	chavesRemotas.pbKey = chavePublicaRemota;
+
+    //Aloca buffers para chaves remotas e Locais
+	chaveRemotaPublica->pbKey.curve = BR_EC_secp256r1;
+	chaveRemotaPublica->pbKey.qlen = sizeof(chaveRemotaPublica->pbBuf);
 
 	while(!DadosProntosParaLeitura()); //Espera para receber a chave pública
 
@@ -679,16 +713,16 @@ VOLTA:
 	pacoteDecodificado = RetiraDadosDeQuadroRecebido(pacoteRecebido, tamPacoteRx, 0, NULL, NULL, &tamPacoteDecodifcado);
 	if(tamPacoteDecodifcado != 65)	while(true); //Erro (não bate com tamanho da chave pública)
 
-	memcpy(chavePublicaRemotaBuf, pacoteDecodificado, tamPacoteDecodifcado);
+	memcpy(chaveRemotaPublica->pbBuf, pacoteDecodificado, tamPacoteDecodifcado);
 	secure_zero(pacoteDecodificado, tamPacoteDecodifcado);
 	free(pacoteDecodificado); //Libera a memória alocada para o pacote
 
-    if(keygen_ec(BR_EC_secp256r1, &chavesLocais) == 1) // Gera chaves Locais (Publica e Privada
+	if(keygen_ec(BR_EC_secp256r1, chaveLocalPrivada, chaveLocalPublica) == 1) // Gera chaves Locais (Publica e Privada
 	{
     	/* == Enviando a Chave Publica  == */
 
     	// Empacota Chave publica sem Criptografia
-    	pacoteEnviado = GeraQuadroParaEnvio(chavesLocais.pbKey.q, chavesLocais.pbKey.qlen, 0,NULL ,NULL, &tamPacoteTx);
+    	pacoteEnviado = GeraQuadroParaEnvio(chaveLocalPublica->pbKey.q, chaveLocalPublica->pbKey.qlen, 0,NULL ,NULL, &tamPacoteTx);
     	if(pacoteEnviado == NULL || tamPacoteTx == 0)	while(true);
 
     	// Envia a Chave publica
@@ -698,7 +732,7 @@ VOLTA:
     	secure_zero(pacoteEnviado, tamPacoteTx);
     	free(pacoteEnviado);
 
-    	if(!ComputeSharedSecret(&chavesLocais.pvKey, &chavesRemotas.pbKey, segredo1)) //Gera o Segredo Compartilhado
+    	if(!ComputeSharedSecret(&chaveLocalPrivada->pvKey, &chaveRemotaPublica->pbKey, segredo1)) //Gera o Segredo Compartilhado
     	{
     		/* == Enviando o Desafio == */
 
