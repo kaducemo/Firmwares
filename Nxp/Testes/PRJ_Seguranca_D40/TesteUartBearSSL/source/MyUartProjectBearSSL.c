@@ -407,7 +407,7 @@ uint8_t *CriaQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
 	if(!codificado)
 		return NULL;
 
-	base64Encode(codificado, input, q);
+	qOut = base64Encode(codificado, input, q);
 
 
 	output = malloc(qOut+2);
