@@ -27,6 +27,7 @@
 #include "PubKey.h"
 #include "PrvKey.h"
 #include "PSKLib.h"
+#include "base64.h"
 
 
 /* TODO: insert other include files here. */
@@ -399,10 +400,14 @@ uint8_t *CriaQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
 	size_t qOut = 0;
 	*qOutput = 0;
 
-	codificado = CodificaDados7bits(input, q, &qOut);
+//	codificado = CodificaDados7bits(input, q, &qOut);
+//	if(!qOut)
 
-	if(!qOut)
+	codificado = malloc(base64EncodedLength(q));
+	if(!codificado)
 		return NULL;
+
+	base64Encode(codificado, input, q);
 
 
 	output = malloc(qOut+2);
@@ -641,42 +646,6 @@ uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8
 }
 
 
-//void TestePSK()
-//{
-//	char sec[] = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff};
-//	char ikm[65];
-//	memset(ikm,0,65);
-//	char a = 0;
-//	asm("NOP");
-//	asm("NOP");
-//
-//	if(!psk_ikm_get(60, sec, ikm))
-//		while(true);
-//	a = ikm[0];
-//	a = ikm[1];
-//	a = ikm[64];
-//
-//	if(!psk_ikm_get(33, sec, ikm))
-//		while(true);
-//	a = ikm[0];
-//	a = ikm[1];
-//	a = ikm[64];
-//
-//	if(!psk_ikm_get(59, sec, ikm))
-//		while(true);
-//	a = ikm[0];
-//	a = ikm[1];
-//	a = ikm[64];
-//
-//	if(!psk_ikm_get(0, sec, ikm))
-//		while(true);
-//	a = ikm[0];
-//	a = ikm[1];
-//	a = ikm[64];
-//
-//}
-
-
 /* TODO: insert other definitions and declarations here. */
 
 /*
@@ -698,8 +667,6 @@ int main(void) {
     BOARD_InitDebugConsole();
 #endif
 
-
-//    TestePSK();
 	uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!";
 	size_t tamPacoteRx = 0, tamPacoteTx = 0;
 	size_t tamPacoteDecodifcado = 0;
