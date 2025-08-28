@@ -434,7 +434,7 @@ uint8_t *ObtemDadosQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
 	return pacoteDecodificado;
 }
 
-uint8_t *RetiraDadosDeQuadroRecebido(uint8_t *dadosRx, size_t lenRx, uint8_t cripto, uint8_t *secret, uint64_t *contador, size_t *lenOut)
+uint8_t *RetiraDadosDeQuadroRecebido(uint8_t *dadosRx, size_t lenRx, uint8_t cripto, uint8_t *ikm, uint64_t *contador, size_t *lenOut)
 /* Esta função retorna os dados de um quadro recebido. Esse quadro por padrão
  * está codificado em 7 bits e possui header e ainda pode estar criptografado.
  * Os dados retornados devem ser desalocados manualmente após seu uso.
@@ -479,14 +479,14 @@ uint8_t *RetiraDadosDeQuadroRecebido(uint8_t *dadosRx, size_t lenRx, uint8_t cri
 			/* Produz Key Solucao*/
 			br_hkdf_context hkdfSolKey;
 			br_hkdf_init(&hkdfSolKey, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
-			br_hkdf_inject(&hkdfSolKey, secret, ECDH_SEC_LEN);
+			br_hkdf_inject(&hkdfSolKey, ikm, ECDH_SEC_LEN);
 			br_hkdf_flip(&hkdfSolKey);
 			br_hkdf_produce(&hkdfSolKey, info, sizeof(info), key, sizeof(key));
 
 			/* Produz IV Solucao*/
 			br_hkdf_context hkdfSolIV;
 			br_hkdf_init(&hkdfSolIV, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
-			br_hkdf_inject(&hkdfSolIV, secret, ECDH_SEC_LEN);
+			br_hkdf_inject(&hkdfSolIV, ikm, ECDH_SEC_LEN);
 			br_hkdf_flip(&hkdfSolIV);
 			br_hkdf_produce(&hkdfSolIV, info, sizeof(info), iv, sizeof(iv));
 
@@ -541,7 +541,7 @@ uint8_t *RetiraDadosDeQuadroRecebido(uint8_t *dadosRx, size_t lenRx, uint8_t cri
 	return output;
 }
 
-uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8_t *secret ,uint64_t *contador, size_t *lenOut)
+uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8_t *ikm ,uint64_t *contador, size_t *lenOut)
 /*Esta função retorna um quadro pronto para ser transmitido. Esses dados podem ou não serem criptografados. *
  * O quadro retornado deve ser desalocado manualmente após seu uso.
  * @param dados(in): Dados para serem empacotados
@@ -567,7 +567,7 @@ uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8
 	if(cripto)
 	// Vai criptografar
 	{
-		if(dados != NULL && lenIn != 0 && secret != NULL && contador != NULL)
+		if(dados != NULL && lenIn != 0 && ikm != NULL && contador != NULL)
 		//Verifica integridade dos dados de entrada
 		{
 			memcpy(&info[HKDF_INFO_LEN - sizeof(uint64_t)], contador, sizeof(uint64_t)); // Atualiza INFO a cada mensagem enviada
@@ -575,7 +575,7 @@ uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8
 			// Produz Key AES256-GCM
 			br_hkdf_context hkdfKey;
 			br_hkdf_init(&hkdfKey, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
-			br_hkdf_inject(&hkdfKey, secret, ECDH_SEC_LEN);
+			br_hkdf_inject(&hkdfKey, ikm, ECDH_SEC_LEN);
 			br_hkdf_flip(&hkdfKey);
 			br_hkdf_produce(&hkdfKey, info, sizeof(info), key, AES_KEY_LEN);	 //Produz Chave
 
@@ -583,7 +583,7 @@ uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8
 			// Produz IV GCM
 			br_hkdf_context hkdfIV;
 			br_hkdf_init(&hkdfIV, &br_sha256_vtable, salt_hkdf, strlen(salt_hkdf));
-			br_hkdf_inject(&hkdfIV, secret, ECDH_SEC_LEN);
+			br_hkdf_inject(&hkdfIV, ikm, ECDH_SEC_LEN);
 			br_hkdf_flip(&hkdfIV);
 			br_hkdf_produce(&hkdfIV, info, sizeof(info), iv, sizeof(iv));
 
@@ -756,10 +756,17 @@ VOLTA:
 
     	if(!ComputeSharedSecret(&chaveLocalPrivada->pvKey, &chaveRemotaPublica->pbKey, segredo1)) //Gera o Segredo Compartilhado
     	{
+
+
     		/* == Enviando o Desafio == */
 
+    		// Produz IKM
+			uint8_t ikm[ECDH_SEC_LEN];
+			if(!psk_ikm_get(1, (char *)segredo1, (char *)ikm)) //Gera IKM com segredo e código do controlador #1
+				while(true);
+
 			//Cria um quadro criptografado contendo o Desafio
-			pacoteEnviado = GeraQuadroParaEnvio(plain, sizeof(plain), 1, segredo1, &contadorMensagens, &tamPacoteTx);
+			pacoteEnviado = GeraQuadroParaEnvio(plain, sizeof(plain), 1, ikm, &contadorMensagens, &tamPacoteTx);
 
 			/*Envia o Desafio*/
 			UART_WriteBlocking(UART0, pacoteEnviado, tamPacoteTx);
@@ -777,7 +784,7 @@ VOLTA:
 			if(!tamPacoteRx)	while(true); //Erro
 
 			//Decifra pacote da solucão
-			pacoteDecodificado = RetiraDadosDeQuadroRecebido(pacoteRecebido, tamPacoteRx, 1, segredo1, &contadorMensagens, &tamPacoteDecodifcado);
+			pacoteDecodificado = RetiraDadosDeQuadroRecebido(pacoteRecebido, tamPacoteRx, 1, ikm, &contadorMensagens, &tamPacoteDecodifcado);
 			if(!tamPacoteDecodifcado)	while(true); //Erro Decodificacao
 
 			/*Desaloca solucao*/

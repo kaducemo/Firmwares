@@ -23,7 +23,8 @@ unsigned int psk_lenght_get();
  * Chame essa função para obter o IKM, utilizado no HKDF.
  * Deve ser usada junto com o endereço do controlador e
  * o segredo compartilhado ECDH.
- * @param index (in): Código do Controlador (1-63)
+ * @param index (in): ID do Controlador (1-63), caso 0
+ * se refere a um controlador que ainda não possui uma ID.
  * @param sec (in): Segredo ECDH nao compactado (65 bytes)
  * @param ikm (out): Vetor do IKM (65 bytes)
  * @return Retorna 0 se falhar a geração da IKM.

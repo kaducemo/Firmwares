@@ -10,7 +10,7 @@
 #include "PSKLib.h"
 #include <stddef.h>
 
-#define CTRL_MIN_ADD	1
+#define CTRL_MIN_ADD	0
 #define CTRL_MAX_ADD	63
 #define PSK_QTY 		10
 #define PSK_LENGHT 		65
@@ -43,7 +43,7 @@ int psk_ikm_get(int index, char *sec, char *ikm)
 	int ret = 0;
     if (index >= CTRL_MIN_ADD && index <= CTRL_MAX_ADD && sec[0] == 0x04)
     {
-    	int unidade = index % 10; //Obtem o indice da PSK
+		int unidade = index % 10; //Obtem o indice da PSK
 
     	for (size_t i = 0; i < PSK_LENGHT; i++)
 			ikm[i] = psk[unidade][i] ^ (sec[i] ^ BIT_INV_MASK); //Obfuscacao das PSKs
