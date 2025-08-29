@@ -112,11 +112,25 @@ unsigned int   base64EncodedLength(unsigned int uiTamanhoOrigem)
 	return (4 * ((uiTamanhoOrigem + 2) / 3));
 }
 
-unsigned int   base64DecodedLength(const unsigned char *pu8Origem)
+
+unsigned int base64DecodedLength(const unsigned char *pu8Origem, int n)
 /*
- * A quantidade de Bytes na saída vai depender do no. de padding
- * out = ((N/4)*3)-P
+ * A quantidade de Bytes na saída vai depender do número de paddings p
+ * Fórmula: out = ((n / 4) * 3) - P
  */
 {
-	return 0;
+    unsigned int p = 0; // Quantidade de paddings '='
+    unsigned int out = 0;
+
+    // Verifica quantos paddings existem no final
+    if (n >= 2 && pu8Origem[n - 1] == '=')
+        p++;
+    if (n >= 2 && pu8Origem[n - 2] == '=')
+        p++;
+
+    // Aplica a fórmula
+    out = ((n / 4) * 3) - p;
+
+    return out;
 }
+

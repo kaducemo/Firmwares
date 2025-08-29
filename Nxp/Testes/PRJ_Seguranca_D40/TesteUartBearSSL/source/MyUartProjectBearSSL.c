@@ -403,12 +403,16 @@ uint8_t *CriaQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
 //	codificado = CodificaDados7bits(input, q, &qOut);
 //	if(!qOut)
 
-	codificado = malloc(base64EncodedLength(q));
+	int tam = base64EncodedLength(q);
+	codificado = malloc(tam);
 	if(!codificado)
 		return NULL;
 
 	qOut = base64Encode(codificado, input, q);
 
+	//Seta bit 1 dos dados codificados
+	for(int i = 0; i < qOut; i++)
+		codificado[i] |= 0x80;
 
 	output = malloc(qOut+2);
 	if(output == NULL)	return NULL;
@@ -435,7 +439,16 @@ uint8_t *ObtemDadosQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput)
  * return: ponteiro para dados decodificados alocados dinamicamente (desalocar manualmente)
  * */
 {
-	uint8_t *pacoteDecodificado = DecodificaDados7bits(&input[1], q-2, qOutput);
+	//	uint8_t *pacoteDecodificado = DecodificaDados7bits(&input[1], q-2, qOutput);
+
+	for(int i = 0; i < q; i++) //retira o bit 1 de todos os dados
+		input[i] &= 0x7F;
+
+	int tam = base64DecodedLength(input, q);
+	uint8_t *pacoteDecodificado = malloc(tam);
+	if(!pacoteDecodificado)
+		return NULL;
+	*qOutput = base64Decode(pacoteDecodificado, input, q);
 	return pacoteDecodificado;
 }
 
@@ -699,7 +712,7 @@ VOLTA:
 	tamPacoteRx = LeDadosSerial(&pacoteRecebido);
 	if(!tamPacoteRx)	while(true); //Erro
 
-	pacoteDecodificado = RetiraDadosDeQuadroRecebido(pacoteRecebido, tamPacoteRx, 0, NULL, NULL, &tamPacoteDecodifcado);
+	pacoteDecodificado = RetiraDadosDeQuadroRecebido(&pacoteRecebido[1], tamPacoteRx-2, 0, NULL, NULL, &tamPacoteDecodifcado);
 	if(tamPacoteDecodifcado != 65)	while(true); //Erro (não bate com tamanho da chave pública)
 
 	memcpy(chaveRemotaPublica->pbBuf, pacoteDecodificado, tamPacoteDecodifcado);
@@ -751,7 +764,7 @@ VOLTA:
 			if(!tamPacoteRx)	while(true); //Erro
 
 			//Decifra pacote da solucão
-			pacoteDecodificado = RetiraDadosDeQuadroRecebido(pacoteRecebido, tamPacoteRx, 1, ikm, &contadorMensagens, &tamPacoteDecodifcado);
+			pacoteDecodificado = RetiraDadosDeQuadroRecebido(&pacoteRecebido[1], tamPacoteRx-2, 1, ikm, &contadorMensagens, &tamPacoteDecodifcado);
 			if(!tamPacoteDecodifcado)	while(true); //Erro Decodificacao
 
 			/*Desaloca solucao*/
