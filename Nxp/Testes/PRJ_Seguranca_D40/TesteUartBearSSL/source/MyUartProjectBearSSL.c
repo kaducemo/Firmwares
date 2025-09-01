@@ -36,19 +36,22 @@
  ******************************************************************************/
 
 // Tamanhos padrão para GCM
-#define GCM_IV_LEN   	12
-#define GCM_TAG_LEN  	16
-#define AES_KEY_LEN  	32  // AES-256
+#define GCM_IV_LEN   		12
+#define GCM_TAG_LEN  		16
+#define AES_KEY_LEN  		16  // AES-128
 
 
-#define ECDH_SEC_LEN 	65  //Tamanho do Secredo ECDH formato não compactado
-#define HKDF_INFO_LEN	18
+#define ECDH_SEC_LEN 		65  //Tamanho do Secredo ECDH formato não compactado
+#define HKDF_INFO_SALT_LEN	16
+
+#define MSG_BY_SESSION		4 //Diz a quantidade de mensagens até a sessão seja trocada
 
 #define OK	1
 #define NOK 0
 
 #define CLEAR_MSB_N_BITS(byte, n) ((byte) & (255U >> n)) //Macros auxiliares
 #define CLEAR_LSB_N_BITS(byte, n) ((byte) & (255U << n))
+
 
 
 uint8_t rxSerialBuffer[512] = {0}; //Buffer utilizado na porta serial
@@ -465,10 +468,12 @@ uint8_t *RetiraDadosDeQuadroRecebido(uint8_t *dadosRx, size_t lenRx, uint8_t cri
  * */
 {
 	uint8_t *output = NULL;
-	const char *salt_hkdf = "DATAPROM_SALT";
-	char info[HKDF_INFO_LEN] = {'D','A','T','A','S','E','C','R','E','T','\0','\0','\0','\0','\0','\0','\0','\0'};
+	//const char *salt_hkdf = "DATAPROM_SALT";
+	char salt_hkdf[HKDF_INFO_SALT_LEN] = {'D','A','T','A','S','A','L','T','\0','\0','\0','\0','\0','\0','\0','\0'};
+	char info[HKDF_INFO_SALT_LEN] = {'D','A','T','A','I','N','F','O','\0','\0','\0','\0','\0','\0','\0','\0'};
 	uint8_t iv[GCM_IV_LEN] = {0}; // IV GCM 12 bytes
 	uint8_t key[AES_KEY_LEN] = {0}; //Chave GCM
+	uint64_t sessao = 0;
 
 	if(cripto)
 	{
@@ -491,8 +496,10 @@ uint8_t *RetiraDadosDeQuadroRecebido(uint8_t *dadosRx, size_t lenRx, uint8_t cri
 			memcpy(contador, pacoteDecodificado, sizeof(uint64_t)); //Salva Contador
 			memcpy(solucaoCripto, &pacoteDecodificado[sizeof(uint64_t)], tamSolucaoCripto); //Salva Mensagem
 
-			/* Atualiza INFO com o contador de Mensagens*/
-			memcpy(&info[sizeof(info) - sizeof(uint64_t)], contador, sizeof(uint64_t));
+			/* Atualiza INFO e SALT com o contador de Mensagens*/
+			memcpy(&info[sizeof(info) - sizeof(uint64_t)], contador, sizeof(uint64_t)); //Atualiza INFO
+			sessao = (uint64_t)(*contador / MSG_BY_SESSION);
+			memcpy(&salt_hkdf[sizeof(salt_hkdf) - sizeof(uint64_t)], &sessao, sizeof(uint64_t)); // Atualiza SALT
 
 			/* Produz Key Solucao*/
 			br_hkdf_context hkdfSolKey;
@@ -572,12 +579,14 @@ uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8
 
 {
 	uint8_t *output = NULL;
-	const char *salt_hkdf = "DATAPROM_SALT";
-	char info[HKDF_INFO_LEN] = {'D','A','T','A','S','E','C','R','E','T','\0','\0','\0','\0','\0','\0','\0','\0'};
+	//const char *salt_hkdf = "DATAPROM_SALT";
+	char info[HKDF_INFO_SALT_LEN] = 	 {'D','A','T','A','I','N','F','O','\0','\0','\0','\0','\0','\0','\0','\0'};
+	char salt_hkdf[HKDF_INFO_SALT_LEN] = {'D','A','T','A','S','A','L','T','\0','\0','\0','\0','\0','\0','\0','\0'};
 	uint8_t iv[GCM_IV_LEN] = {0}; // IV GCM 12 bytes
 	uint8_t key[AES_KEY_LEN] = {0}; //Chave GCM
 	uint8_t tag[GCM_TAG_LEN] = {0};
 	uint8_t *encrypted = NULL;
+	uint64_t sessao = 0;
 
 
 	*lenOut = 0;
@@ -588,7 +597,10 @@ uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8
 		if(dados != NULL && lenIn != 0 && ikm != NULL && contador != NULL)
 		//Verifica integridade dos dados de entrada
 		{
-			memcpy(&info[HKDF_INFO_LEN - sizeof(uint64_t)], contador, sizeof(uint64_t)); // Atualiza INFO a cada mensagem enviada
+			memcpy(&info[sizeof(info) - sizeof(uint64_t)], contador, sizeof(uint64_t)); // Atualiza INFO a cada mensagem enviada
+			sessao = (uint64_t)(*contador / MSG_BY_SESSION);
+			memcpy(&salt_hkdf[sizeof(salt_hkdf) - sizeof(uint64_t)], &sessao, sizeof(uint64_t)); // Atualiza SALT
+//			memcpy(&salt_hkdf[sizeof(salt_hkdf) - sizeof(uint64_t)], (uint64_t)(contador/4), sizeof(uint64_t)); // Atualiza SALT
 
 			// Produz Key AES256-GCM
 			br_hkdf_context hkdfKey;
