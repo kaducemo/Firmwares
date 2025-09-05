@@ -38,7 +38,7 @@ static unsigned char base64Indice(unsigned char u8Caracter)
 } 
 
 
-unsigned short base64Encode(unsigned char *pu8Destino, const unsigned char *pu8Origem, unsigned short u16TamanhoOrigem)
+size_t base64Encode(unsigned char *pu8Destino, const unsigned char *pu8Origem, unsigned short u16TamanhoOrigem)
 {
     unsigned char u8C1, u8C2, u8C3;
     unsigned short u16Indice;
@@ -76,7 +76,7 @@ unsigned short base64Encode(unsigned char *pu8Destino, const unsigned char *pu8O
 }
 
 
-unsigned short base64Decode(unsigned char *pu8Destino, const unsigned char *pu8Origem, unsigned short u16TamanhoOrigem)
+size_t base64Decode(unsigned char *pu8Destino, const unsigned char *pu8Origem, unsigned short u16TamanhoOrigem)
 {
     unsigned char u8D1, u8D2, u8D3, u8D4;
     unsigned short u16Indice;
@@ -107,13 +107,13 @@ unsigned short base64Decode(unsigned char *pu8Destino, const unsigned char *pu8O
 }
 
 
-unsigned int   base64EncodedLength(unsigned int uiTamanhoOrigem)
+size_t   base64EncodedLength(unsigned int uiTamanhoOrigem)
 {
 	return (4 * ((uiTamanhoOrigem + 2) / 3));
 }
 
 
-unsigned int base64DecodedLength(const unsigned char *pu8Origem, int n)
+size_t base64DecodedLength(const unsigned char *pu8Origem, int n)
 /*
  * A quantidade de Bytes na saída vai depender do número de paddings p
  * Fórmula: out = ((n / 4) * 3) - P
