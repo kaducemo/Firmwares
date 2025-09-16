@@ -22,7 +22,7 @@
 #define NOK 0
 
 
-
+void destroy_obj(void **v, size_t n);
 void secure_zero(void *v, size_t n);
 char *hex_array_to_string(uint8_t *in, uint8_t len);
 void delay(void);

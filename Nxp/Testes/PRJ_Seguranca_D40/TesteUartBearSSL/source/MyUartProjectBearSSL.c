@@ -38,20 +38,24 @@
  * Code
  ******************************************************************************/
 
-#define DP40_CODIGO				1
+#define DP40_CODIGO				5
 
 
 #define UART_RX_BUFFER_LEN		512
 
 uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!";
 
-
+PrvKey *chaveLocalPrivada = NULL;
+PubKey *chaveLocalPublica = NULL, *chaveRemotaPublica = NULL;
 
 
 
 uint8_t rxSerialBuffer[UART_RX_BUFFER_LEN] = {0}; //Buffer utilizado na porta serial
 size_t qtDadosDisponiveis = 0; //Diz quantos bytes estão disponíveis para serem lidos quando um pacote é fechado
 uint64_t contadorMensagens = 0; //Conta o fluxo de mensagens. Importante para geração da IVs.
+
+uint8_t segredo[ECDH_SEC_LEN] = {0}; //Segredo ECDH
+uint8_t ikm[ECDH_SEC_LEN] = {0};
 
 
 void UART0_SERIAL_RX_TX_IRQHANDLER(void){
@@ -282,55 +286,198 @@ void processa_dados_rx(uint8_t interface, uint8_t *dados, size_t q, uint8_t *ikm
 	//Processa dados recebidos atraves de uma interface
 	//Interface == 0: UART, 1 == EHT
 
+	DP_Frame_t *frameResposta = NULL, *frameRecebido = NULL;
+	uint8_t *frameRespostaVetorizado = NULL;
+	size_t tamanhoRespostaVetorizada = 0;
+
 	if(!interface) {
 		//UART
 
-		DP_Frame_t *frame =  ObtemFrameDoVetor(dados, q, ikm);
+		frameRecebido =  ObtemFrameDoVetor(dados, q, ikm);
 
-		switch (frame->op)
+		if(frameRecebido)
 		{
-			case MENSAGEM_INICIAL_GSM_80: //Resposta do Antares
+			switch (frameRecebido->op)
 			{
-				break;
+				case MENSAGEM_INICIAL_GSM_80: //Resposta do Antares
+				{
+					break;
+				}
+
+				case ENVIA_IDENTIFICACAO_8D: // Programador deseja se conectar
+				{
+					uint8_t auxEnd[3] = {0};
+
+					uint8_t versaoSW[4] = {'T', '3', '0', '1'};
+					uint8_t codigoControlador[6] = {'0', '0', '0', '0', '0', '0' + DP40_CODIGO};
+					uint8_t descricao[128] = {0};
+					const char *minhaDescricao = "Controlador DP40A - FW Seguro";
+					memcpy(descricao, minhaDescricao, strlen(minhaDescricao) + 1);
+					uint8_t versaoTabela[2] = {0x30 | 0x80, 0x01 | 0x80};
+					uint8_t versaoProtocolo[2] = {0x30 | 0x80, 0x02 | 0x80};
+					size_t tamDados = sizeof(versaoSW) + sizeof(codigoControlador) + sizeof(descricao) + sizeof(versaoTabela) + sizeof(versaoProtocolo);
+					uint8_t *dados = malloc(tamDados);
+					memcpy(&dados[0], versaoSW, 4);
+					memcpy(&dados[0+4], codigoControlador, 6);
+					memcpy(&dados[0+4+6], descricao, 128);
+					memcpy(&dados[0+4+6+128], versaoTabela, 2);
+					memcpy(&dados[0+4+6+128+2], versaoProtocolo, 2);
+
+
+					VetorizaCodigoDoControlador(DP40_CODIGO, auxEnd);
+
+					frameResposta = ConstroiFrameQNS(auxEnd, ENVIA_IDENTIFICACAO_8D, dados, tamDados ); //Constroi Quadro Nao Seguro
+
+					frameRespostaVetorizado = VetorizaQuadro(frameResposta, &tamanhoRespostaVetorizada);
+					UART_WriteBlocking(UART0, frameRespostaVetorizado, tamanhoRespostaVetorizada);
+
+					//Destroi chaves antigas e cria novas
+					secure_zero(segredo, ECDH_SEC_LEN);
+					if (chaveLocalPrivada != NULL)
+					{
+						Destroy_PrvKey(chaveLocalPrivada);
+						chaveLocalPrivada = NULL;
+					}
+					chaveLocalPrivada = New_PrvKey();
+
+					if (chaveLocalPublica != NULL)
+					{
+						Destroy_PubKey(chaveLocalPublica);
+						chaveLocalPublica = NULL;
+					}
+					chaveLocalPublica = New_PubKey();
+
+					// Cria novas chaves Locais Publicas e Privadas
+					if(keygen_ec(BR_EC_secp256r1, chaveLocalPrivada, chaveLocalPublica) != 1)
+					{
+						//Houve problema na geracao, apaga as chaves
+						if (chaveLocalPublica != NULL)
+						{
+							Destroy_PubKey(chaveLocalPublica);
+							chaveLocalPublica = NULL;
+						}
+						if (chaveLocalPrivada != NULL)
+						{
+							Destroy_PrvKey(chaveLocalPrivada);
+							chaveLocalPrivada = NULL;
+						}
+					}
+					contadorMensagens = 0;
+
+
+					break;
+				}
+
+				case TROCA_DADOS_SEGUROS_B5: //Troca de dados segura
+				{
+					uint8_t auxEnd[3] = {0};
+
+
+					contadorMensagens = frameRecebido->iterador > contadorMensagens ? frameRecebido->iterador : contadorMensagens;
+					VetorizaCodigoDoControlador(DP40_CODIGO, auxEnd);
+
+					if(frameRecebido->dados[0] == SOLICITA_DATA_E_HORA_86)
+					{
+						uint8_t dados[8] = {frameRecebido->dados[0], 0x81, 0x8F, 0xBB, 0x80, 0x81, 0x81, 0x87};
+						frameResposta = ConstroiFrameQS(auxEnd, dados, sizeof(dados), &contadorMensagens, ikm);
+						frameRespostaVetorizado = VetorizaQuadro(frameResposta, &tamanhoRespostaVetorizada);
+						UART_WriteBlocking(UART0, frameRespostaVetorizado, tamanhoRespostaVetorizada);
+					}
+					else
+					{
+						asm("NOP");
+						asm("NOP");
+					}
+					break;
+				}
+				case SOLICITA_DATA_E_HORA_86:
+				{
+					uint8_t auxEnd[3] = {0};
+					VetorizaCodigoDoControlador(DP40_CODIGO, auxEnd);
+					uint8_t dados[7] = {0x81, 0x8F, 0xBB, 0x80, 0x81, 0x81, 0x87};
+					frameResposta = ConstroiFrameQNS(auxEnd, SOLICITA_DATA_E_HORA_86, dados, sizeof(dados));
+					frameRespostaVetorizado = VetorizaQuadro(frameResposta, &tamanhoRespostaVetorizada);
+					UART_WriteBlocking(UART0, frameRespostaVetorizado, tamanhoRespostaVetorizada);
+
+					break;
+				}
+
+				case TROCA_CHAVES_PUBLICA_B6: //Troca de chaves ECDH
+				{
+					uint8_t auxEnd[3] = {0};
+					VetorizaCodigoDoControlador(DP40_CODIGO, auxEnd);
+
+
+					uint8_t *dadosDecodificadosB64= malloc(base64DecodedLength(frameRecebido->dados, frameRecebido->tamanho));
+					if(dadosDecodificadosB64 == NULL)
+						break;
+					size_t tamPacoteDecodifcado64 = base64Decode(dadosDecodificadosB64, frameRecebido->dados, frameRecebido->tamanho);
+
+					if(tamPacoteDecodifcado64 != 65)
+					{
+						destroy_obj((void **)&dadosDecodificadosB64, tamPacoteDecodifcado64);
+						break;
+					}
+
+					if(chaveRemotaPublica != NULL)
+					{
+						Destroy_PubKey(chaveRemotaPublica);
+						chaveRemotaPublica = NULL;
+					}
+
+					chaveRemotaPublica = New_PubKey(); //Aloca Espaco para nova chave publica remota
+					if(chaveRemotaPublica == NULL)
+						break;
+
+
+					memcpy(chaveRemotaPublica->pbBuf, dadosDecodificadosB64, tamPacoteDecodifcado64); //Copia para o buffer da chave
+					chaveRemotaPublica->pbKey.curve = BR_EC_secp256r1;
+					chaveRemotaPublica->pbKey.qlen = sizeof(chaveRemotaPublica->pbBuf);
+
+					destroy_obj((void **)&dadosDecodificadosB64, tamPacoteDecodifcado64);	 //Libera memoria da chave decodificada
+
+					if(chaveLocalPrivada != NULL && chaveLocalPublica != NULL) // As chaves já existem
+					{
+						/* == Enviando a Chave Publica  == */
+
+						//Codifica a chave Publica em B64
+						size_t tamChavePublicaB64 = base64EncodedLength(chaveLocalPublica->pbKey.qlen);
+						uint8_t *chavePublicaB64 = malloc(tamChavePublicaB64);
+						if(chavePublicaB64 == NULL) //Nao conseguiu alocar
+							break;
+
+						secure_zero(chavePublicaB64, tamChavePublicaB64);
+						base64Encode(chavePublicaB64, chaveLocalPublica->pbKey.q, chaveLocalPublica->pbKey.qlen);
+
+
+						DP_Frame_t *frameResposta = ConstroiFrameQNS(auxEnd, TROCA_CHAVES_PUBLICA_B6, chavePublicaB64, tamChavePublicaB64 ); //Constroi Quadro Nao Seguro
+						destroy_obj((void **)&chavePublicaB64, tamChavePublicaB64); //Libera a memoria do objeto alocado para chaveB64
+
+
+						frameRespostaVetorizado = VetorizaQuadro(frameResposta, &tamanhoRespostaVetorizada);
+						if(!tamanhoRespostaVetorizada)
+							break;
+
+						if(!ComputeSharedSecret(&chaveLocalPrivada->pvKey, &chaveRemotaPublica->pbKey, segredo)) //Gera o Segredo Compartilhado
+						{
+							// Produz IKM
+							if(!psk_ikm_get(1, (char *)segredo, (char *)ikm)) //Gera IKM com segredo e código do controlador #1
+								while(true);
+						}
+
+						UART_WriteBlocking(UART0, frameRespostaVetorizado, tamanhoRespostaVetorizada);
+					}
+					break;
+				}
 			}
-
-			case ENVIA_IDENTIFICACAO_8D: // Programador deseja se conectar
-			{
-				uint8_t versaoSW[4] = {'T', '3', '0', '1'};
-				uint8_t codigoControlador[6] = {'0', '0', '0', '0', '0', '1'};
-				uint8_t descricao[128] = {0};
-				uint8_t versaoTabela[2] = {0x30 | 0x80, 0x00 | 0x80};
-				uint8_t versaoProtocolo[2] = {0x30 | 0x80, 0x00 | 0x80};
-				size_t tamDados = sizeof(versaoSW) + sizeof(codigoControlador) + sizeof(descricao) + sizeof(versaoTabela) + sizeof(versaoProtocolo);
-				uint8_t *dados = malloc(tamDados);
-				memcpy(&dados[0], versaoSW, 4);
-				memcpy(&dados[0+4], codigoControlador, 6);
-				memcpy(&dados[0+4+6], descricao, 128);
-				memcpy(&dados[0+4+6+128], versaoTabela, 2);
-				memcpy(&dados[0+4+6+128+2], versaoProtocolo, 2);
-
-				uint8_t auxEnd[3] = {0};
-				VetorizaCodigoDoControlador(DP40_CODIGO, auxEnd);
-
-				DP_Frame_t *frame = ConstroiFrameQNS(auxEnd, ENVIA_IDENTIFICACAO_8D, dados, tamDados ); //Constroi Quadro Nao Seguro
-
-
-				break;
-			}
-
-			case TROCA_DADOS_SEGUROS_B5: //Troca de dados segura
-			{
-				break;
-			}
-
-			case TROCA_CHAVES_PUBLICA_B6: //Troca de chaves ECDH
-			{
-				break;
-			}
-
 		}
 
-
+		DestrutorFrames(&frameResposta);
+		DestrutorFrames(&frameRecebido);
+		if(frameRespostaVetorizado != NULL)
+		{
+			destroy_obj((void **)&frameRespostaVetorizado, tamanhoRespostaVetorizada);
+		}
 	}
 	else {
 		//ETH
@@ -346,19 +493,8 @@ void processa_dados_rx(uint8_t interface, uint8_t *dados, size_t q, uint8_t *ikm
  */
 int main(void) {
 
-	size_t tamPacoteRx = 0, tamPacoteTx = 0;
-	size_t tamPacoteDecodifcado = 0;
-
+	size_t tamPacoteRx = 0;
 	uint8_t *pacoteRecebido;
-	uint8_t *pacoteEnviado;
-	uint8_t *pacoteDecodificado;
-
-	PrvKey *chaveLocalPrivada = NULL;
-	PubKey *chaveLocalPublica = NULL, *chaveRemotaPublica = NULL;
-
-
-	uint8_t segredo1[ECDH_SEC_LEN] = {0}; //Gera Segredos para comparacao
-	uint8_t ikm[ECDH_SEC_LEN] = {0};
 
     /* Init board hardware. */
     BOARD_InitBootPins();
@@ -368,39 +504,6 @@ int main(void) {
     /* Init FSL debug console. */
     BOARD_InitDebugConsole();
 #endif
-
-//	uint8_t plain[] = "DESAFIO, DP40 - Agora o desafio eh muito maior!!!";
-//	size_t tamPacoteRx = 0, tamPacoteTx = 0;
-//	size_t tamPacoteDecodifcado = 0;
-
-//	uint8_t end[3] = {0x00, 0x01, 0x02};
-//	uint8_t op = 0x8D;
-//	uint8_t dados[] = {0x81, 0x82, 0x83, 0x84, 0x85, 0x86};
-//	uint64_t meuIterador = 128000;
-
-
-//	DP_Frame_t *frame = ConstroiFrameQNS(end, op, dados, sizeof(dados) ); //Constroi Quadro Nao Seguro
-//	size_t tamVetor = 0;
-//	uint8_t *quadroVetorizado = VetorizaQuadro(frame, &tamVetor);
-//	DP_Frame_t *frameRecuperado = ObtemFrameDoVetor(quadroVetorizado, tamVetor, NULL);
-//
-//	DestrutorFrames(&frame);
-//	DestrutorFrames(&frameRecuperado);
-//	free(quadroVetorizado);
-//
-//	secure_zero(segredo1, sizeof(segredo1)); //Limpa segredo1
-//	segredo1[0] = 0x04;
-//	uint8_t meuIkm[ECDH_SEC_LEN];
-//	if(!psk_ikm_get(end[2], (char *)segredo1, (char *) meuIkm)) //Gera IKM com segredo e código do controlador #end[2]
-//		while(true);
-//	frame = ConstroiFrameQS(end, dados, sizeof(dados), &meuIterador, meuIkm);
-//	asm("NOP");
-//	quadroVetorizado = VetorizaQuadro(frame, &tamVetor);
-//	asm("NOP");
-//	frameRecuperado = ObtemFrameDoVetor(quadroVetorizado, tamVetor, meuIkm);
-//	DestrutorFrames(&frame);
-//	DestrutorFrames(&frameRecuperado);
-//	free(quadroVetorizado);
 
 	while(true)
 	{
@@ -426,112 +529,6 @@ int main(void) {
 		}
 
 	}
-
-
-
-
-
-
-
-
-//Comentei tudo 1X DENTRO DOS VOLTA
-
-//VOLTA:
-//
-//	if (chaveLocalPrivada != NULL)		Destroy_PrvKey(chaveLocalPrivada);
-//	chaveLocalPrivada = New_PrvKey();
-//
-//	if (chaveLocalPublica != NULL)		Destroy_PubKey(chaveLocalPublica);
-//	chaveLocalPublica = New_PubKey();
-//
-//	if (chaveRemotaPublica != NULL)		Destroy_PubKey(chaveRemotaPublica);
-//	chaveRemotaPublica = New_PubKey();
-//
-//    memset(segredo1, 0, sizeof(segredo1));
-//
-//
-//
-//    //Aloca buffers para chaves remotas e Locais
-//	chaveRemotaPublica->pbKey.curve = BR_EC_secp256r1;
-//	chaveRemotaPublica->pbKey.qlen = sizeof(chaveRemotaPublica->pbBuf);
-//
-//	while(!dados_prontos_uart()); //Espera para receber a chave pública
-//
-////	uint8_t *pacoteRecebido;
-////	uint8_t *pacoteEnviado;
-////	uint8_t *pacoteDecodificado;
-//
-//	tamPacoteRx = le_dados_uart(&pacoteRecebido);
-//	if(!tamPacoteRx)
-//		while(true); //Erro
-//
-//	pacoteDecodificado = RetiraDadosDeQuadroRecebido(&pacoteRecebido[1], tamPacoteRx-2, 0, NULL, NULL, &tamPacoteDecodifcado);
-//	if(tamPacoteDecodifcado != 65)
-//		while(true); //Erro (não bate com tamanho da chave pública)
-//
-//	memcpy(chaveRemotaPublica->pbBuf, pacoteDecodificado, tamPacoteDecodifcado);
-//	secure_zero(pacoteDecodificado, tamPacoteDecodifcado);
-//	free(pacoteDecodificado); //Libera a memória alocada para o pacote
-//
-//	if(keygen_ec(BR_EC_secp256r1, chaveLocalPrivada, chaveLocalPublica) == 1) // Gera chaves Locais (Publica e Privada
-//	{
-//    	/* == Enviando a Chave Publica  == */
-//
-//    	// Empacota Chave publica sem Criptografia
-//    	pacoteEnviado = GeraQuadroParaEnvio(chaveLocalPublica->pbKey.q, chaveLocalPublica->pbKey.qlen, 0,NULL ,NULL, &tamPacoteTx);
-//    	if(pacoteEnviado == NULL || tamPacoteTx == 0)	while(true);
-//
-//    	// Envia a Chave publica
-//    	UART_WriteBlocking(UART0, pacoteEnviado, tamPacoteTx);
-//
-//    	// Desaloca o Pacote
-//    	secure_zero(pacoteEnviado, tamPacoteTx);
-//    	free(pacoteEnviado);
-//
-//    	if(!ComputeSharedSecret(&chaveLocalPrivada->pvKey, &chaveRemotaPublica->pbKey, segredo1)) //Gera o Segredo Compartilhado
-//    	{
-//
-//
-//    		/* == Enviando o Desafio == */
-//
-//    		// Produz IKM
-////			uint8_t ikm[ECDH_SEC_LEN];
-//			if(!psk_ikm_get(1, (char *)segredo1, (char *)ikm)) //Gera IKM com segredo e código do controlador #1
-//				while(true);
-//
-//			//Cria um quadro criptografado contendo o Desafio
-//			pacoteEnviado = GeraQuadroParaEnvio(plain, sizeof(plain), 1, ikm, &contadorMensagens, &tamPacoteTx);
-//
-//			/*Envia o Desafio*/
-//			UART_WriteBlocking(UART0, pacoteEnviado, tamPacoteTx);
-//			contadorMensagens++;
-//
-//			/*Desaloca pacote*/
-//			secure_zero(pacoteEnviado, tamPacoteTx);
-//			free(pacoteEnviado);
-//
-//			/* == Recebe a Solução == */
-//
-//			//Espera para receber a Solucao do Desafio
-//			while(!dados_prontos_uart()); //Espera para receber a Solucao do Desafio
-//			tamPacoteRx = le_dados_uart(&pacoteRecebido);
-//			if(!tamPacoteRx)	while(true); //Erro
-//
-//			//Decifra pacote da solucão
-//			pacoteDecodificado = RetiraDadosDeQuadroRecebido(&pacoteRecebido[1], tamPacoteRx-2, 1, ikm, &contadorMensagens, &tamPacoteDecodifcado);
-//			if(!tamPacoteDecodifcado)	while(true); //Erro Decodificacao
-//
-//			/*Desaloca solucao*/
-//			secure_zero(pacoteDecodificado, tamPacoteDecodifcado);
-//			free(pacoteDecodificado);
-//    	}
-//    	else
-//    	{
-//    		while(true);
-//    	}
-//	}
-//
-//    goto VOLTA;
 
 /*=========================================================================================*/
 /*=========================================================================================*/

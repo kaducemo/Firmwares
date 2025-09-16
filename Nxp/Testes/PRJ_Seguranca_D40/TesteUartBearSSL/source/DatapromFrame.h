@@ -16,14 +16,15 @@
 
 
 #define ECDH_SEC_LEN 		65  //Tamanho do Secredo ECDH formato não compactado
-#define HKDF_INFO_SALT_LEN	16 // Tamanho dos vetores INFO e SALT
+#define HKDF_INFO_LEN		16 // Tamanho do vetor INFO
+#define HKDF_SALT_LEN	    10 // Tamanho do vetor  SALT
 
 // Tamanhos padrão para GCM
 #define GCM_IV_LEN   		12
 #define GCM_TAG_LEN  		16
 #define AES_KEY_LEN  		16  // AES-128
 
-#define MSG_BY_SESSION		4 //Diz a quantidade de mensagens até a sessão seja trocada
+#define MSG_BY_SESSION		10 //Diz a quantidade de mensagens até a sessão seja trocada
 
 #define END_OFFSET				1
 #define OP_OFFSET				4
@@ -33,7 +34,7 @@
 #define B64_DATA_OFFSET			42
 
 #define LEN_MINIMAL_QNS			7	//Tamanho do quadro nao seguro minimo (sem dados)
-#define LEN_MINIMAL_QS			48  //Tamanho do quadro nao seguro minimo (sem dados, somente opcode cripto)
+#define LEN_MINIMAL_QS			44  //Tamanho do quadro nao seguro minimo (sem dados, somente opcode cripto)
 
 
 
@@ -58,7 +59,7 @@ uint8_t CalculaChecksum(DP_Frame_t *frame);
 void LimpaMSB(uint8_t *vet, size_t q);
 void SetaMSB(uint8_t *vet, size_t q);
 uint8_t ObtemCodigoControladorDoVetor(uint8_t *end);
-void *VetorizaCodigoDoControlador(uint8_t cod, uint8_t *out);
+void VetorizaCodigoDoControlador(uint8_t cod, uint8_t *out);
 
 DP_Frame_t *ObtemFrameDoVetor(uint8_t *vet, size_t q, uint8_t *ikm);
 
@@ -66,19 +67,6 @@ DP_Frame_t *ConstroiFrameQNS(uint8_t *end, uint8_t op, uint8_t *dados, size_t q 
 DP_Frame_t *ConstroiFrameQS(uint8_t *end, uint8_t *dados, size_t q, uint64_t *iterador, uint8_t *ikm); // Constroi Quadro Seguro
 void DestrutorFrames(DP_Frame_t **frame);
 uint8_t *VetorizaQuadro(DP_Frame_t *frame, size_t *qOut);
-
-
-uint8_t *RetiraDadosDeQuadroRecebido(uint8_t *dadosRx, size_t lenRx, uint8_t cripto, uint8_t *ikm, uint64_t *contador, size_t *lenOut);
-uint8_t *GeraQuadroParaEnvio(uint8_t *dados, size_t lenIn, uint8_t cripto, uint8_t *ikm ,uint64_t *contador, size_t *lenOut);
-
-
-uint8_t *CriaQuadroCodificado(uint8_t *dados, size_t q, size_t *qOutput);
-uint8_t *ObtemDadosQuadroCodificado(uint8_t *input, size_t q, size_t *qOutput);
-
-uint8_t* CodificaDados7bits(const uint8_t *input, size_t len_input, size_t *len_out);
-uint8_t* DecodificaDados7bits(const uint8_t* input, size_t len_input, size_t* len_out);
-
-
 
 
 #endif /* DATAPROMFRAME_H_ */

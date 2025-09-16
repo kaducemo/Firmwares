@@ -88,7 +88,6 @@
 
 
 
-
 #define TASK_GET_SWITCH_STATUS_MS   10
 #define TASK_EXECUTE_SWITCH_MS      50
 #define TASK_UPDATE_LEDS_MS         100

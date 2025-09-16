@@ -11,6 +11,14 @@
 #include <stdlib.h>
 
 
+void destroy_obj(void **v, size_t n)
+/*Funcao utilizada pra destruir vetrores alocados dinamicamente*/
+{
+	secure_zero(*v,n);
+	free(*v);
+	*v = NULL;
+}
+
 
 void secure_zero(void *v, size_t n)
 /* Esta a funcao limpa um buffer, retirando residuos da RAM de forma segura e nao
