@@ -10,10 +10,11 @@
 #include "PSKLib.h"
 #include <stddef.h>
 
-#define CTRL_MIN_ADD	0
-#define CTRL_MAX_ADD	63
-#define PSK_QTY 		10
-#define PSK_LENGHT 		65
+#define CTRL_MIN_ADD	0U
+#define CTRL_DUMMY_ADD	63U
+#define CTRL_MAX_ADD	255U
+#define PSK_QTY 		10U
+#define PSK_LENGHT 		65U
 #define BIT_INV_MASK	0xAA
 
 static const char psk[PSK_QTY][PSK_LENGHT] =
@@ -41,13 +42,23 @@ unsigned int psk_lenght_get()
 int psk_ikm_get(int index, char *sec, char *ikm)
 {
 	int ret = 0;
-    if (index >= CTRL_MIN_ADD && index <= CTRL_MAX_ADD && sec[0] == 0x04)
-    {
-		int unidade = index % 10; //Obtem o indice da PSK
+	if(ikm != NULL && sec[0] == 0x04)
+	{
+		if (index >= CTRL_MIN_ADD && index <= CTRL_MAX_ADD)
+		{
+			int unidade = index % 10; //Obtem o indice da PSK
 
-    	for (size_t i = 0; i < PSK_LENGHT; i++)
-			ikm[i] = psk[unidade][i] ^ (sec[i] ^ BIT_INV_MASK); //Obfuscacao das PSKs
-    	ret = 1;
-    }
+			for (size_t i = 0; i < PSK_LENGHT; i++)
+				ikm[i] = psk[unidade][i] ^ (sec[i] ^ BIT_INV_MASK); //Obfuscacao das PSKs
+			ret = 1;
+		}
+		else if(index == CTRL_DUMMY_ADD)
+		{
+			for (size_t i = 0; i < PSK_LENGHT; i++)
+				ikm[i] = psk[0][i] ^ (sec[i] ^ BIT_INV_MASK); //Obfuscacao das PSKs
+			ret = 1;
+		}
+	}
+
     return ret;
 }
