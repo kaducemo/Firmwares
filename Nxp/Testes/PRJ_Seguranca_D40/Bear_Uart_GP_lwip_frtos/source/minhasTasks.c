@@ -665,7 +665,7 @@ void process_task(void *arg)
 			uint8_t *frame_vector = VetorizaQuadro(frame, &frame_len) ;
 
 			//Envia vetor para queue e em seguida desaloca memorias intermediarias
-			QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND,frame_vector, frame_len);
+			QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND_NO_ANSWER,frame_vector, frame_len);
 			if (txQueue != NULL && q_dado != NULL)
 				xQueueSend(txQueue, &q_dado, 0);
 
@@ -857,7 +857,7 @@ void process_task(void *arg)
 							}
 							else {
 								//ETH
-								QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND_ANSWER ,frameRespostaVetorizado, tamanhoRespostaVetorizada);
+								QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND_NO_ANSWER ,frameRespostaVetorizado, tamanhoRespostaVetorizada);
 								if (txQueue != NULL && q_dado != NULL)
 									xQueueSend(txQueue, &q_dado, 0);
 							}
@@ -906,7 +906,7 @@ void process_task(void *arg)
 								{
 									frameResposta = ConstroiFrameQS(auxEnd, dados, sizeof(dados), &contadorMensagensAnt, ikmAnt, 1);
 									frameRespostaVetorizado = VetorizaQuadro(frameResposta, &tamanhoRespostaVetorizada);
-									QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND_ANSWER,frameRespostaVetorizado, tamanhoRespostaVetorizada);
+									QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND_NO_ANSWER,frameRespostaVetorizado, tamanhoRespostaVetorizada);
 									if (txQueue != NULL && q_dado != NULL)
 										xQueueSend(txQueue, &q_dado, 0);
 								}
@@ -937,6 +937,50 @@ void process_task(void *arg)
 							{
 								PRINTF(" -PROCESS_TASK: Recebido TROCA_CHAVES_PUBLICA_B6, TCP\r\n");
 
+
+								PRINTF(" -PROCESS_TASK: Recebida MENSAGEM_INICIAL_GSM_80, TCP\r\n");
+
+								// Apaga IKM e Libera a memoria
+								if(ikmAnt != NULL)
+								{
+									secure_zero(ikmAnt, ECDH_SEC_LEN);
+									vPortFree(ikmAnt);
+									ikmAnt = NULL;
+								}
+
+								//Destroi chaves antigas e cria novas
+								secure_zero(segredoAnt, ECDH_SEC_LEN);
+								if (chaveLocalPrivadaAnt != NULL)
+								{
+									Destroy_PrvKey(chaveLocalPrivadaAnt);
+									chaveLocalPrivadaAnt = NULL;
+								}
+								chaveLocalPrivadaAnt = New_PrvKey();
+
+								if (chaveLocalPublicaAnt != NULL)
+								{
+									Destroy_PubKey(chaveLocalPublicaAnt);
+									chaveLocalPublicaAnt = NULL;
+								}
+								chaveLocalPublicaAnt = New_PubKey();
+
+								// Cria novas chaves Locais Publicas e Privadas
+								if(keygen_ec(BR_EC_secp256r1, chaveLocalPrivadaAnt, chaveLocalPublicaAnt) != 1)
+								{
+									//Houve problema na geracao, apaga as chaves
+									if (chaveLocalPublicaAnt != NULL)
+									{
+										Destroy_PubKey(chaveLocalPublicaAnt);
+										chaveLocalPublicaAnt = NULL;
+									}
+									if (chaveLocalPrivadaAnt != NULL)
+									{
+										Destroy_PrvKey(chaveLocalPrivadaAnt);
+										chaveLocalPrivadaAnt = NULL;
+									}
+								}
+
+
 								if(chaveRemotaPublicaAnt != NULL)
 								{
 									Destroy_PubKey(chaveRemotaPublicaAnt);
@@ -946,6 +990,8 @@ void process_task(void *arg)
 								chaveRemotaPublicaAnt = New_PubKey(); //Aloca Espaco para nova chave publica remota
 								if(chaveRemotaPublicaAnt == NULL)
 									break;
+
+								contadorMensagensAnt = 0;
 
 								memcpy(chaveRemotaPublicaAnt->pbBuf, dadosDecodificadosB64, tamPacoteDecodifcado64); //Copia para o buffer da chave
 								chaveRemotaPublicaAnt->pbKey.curve = BR_EC_secp256r1;
@@ -988,7 +1034,7 @@ void process_task(void *arg)
 										if(!psk_ikm_get(DP40_CODIGO%10, (char *)segredoAnt, (char *)ikmAnt)) //Gera IKM com segredo e código do controlador #1
 											break; //Nao conseguiu gerar IKM
 									}
-									QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND_ANSWER ,frameRespostaVetorizado, tamanhoRespostaVetorizada);
+									QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND_NO_ANSWER ,frameRespostaVetorizado, tamanhoRespostaVetorizada);
 									if (txQueue != NULL && q_dado != NULL)
 										xQueueSend(txQueue, &q_dado, 0);
 								}
@@ -1070,7 +1116,7 @@ void process_task(void *arg)
 								UART_WriteBlocking(UART0, frameRespostaVetorizado, tamanhoRespostaVetorizada);
 							else
 							{
-								QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND_ANSWER ,frameRespostaVetorizado, tamanhoRespostaVetorizada);
+								QueueDados_t *q_dado = new_queue_dados(IFACE_ENET, PACKTYPE_SEND_NO_ANSWER ,frameRespostaVetorizado, tamanhoRespostaVetorizada);
 								if (txQueue != NULL && q_dado != NULL)
 									xQueueSend(txQueue, &q_dado, 0);
 							}

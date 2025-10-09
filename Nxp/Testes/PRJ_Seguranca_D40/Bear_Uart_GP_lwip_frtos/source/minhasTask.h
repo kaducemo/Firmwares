@@ -213,7 +213,7 @@ typedef enum  {
 	PACKTYPE_UNDEF, 	  //Pacote nao definido
 	PACKTYPE_SEND,		  //Envia dado e espera uma resposta
 	PACKTYPE_RECEIVE,	  //Pacote com dados recebidos
-	PACKTYPE_SEND_ANSWER, // Envia resposta
+	PACKTYPE_SEND_NO_ANSWER, // Envia pacote e nao espera resposta
 }PackType_t;
 
 //Estutura utilizada para manipulação de dados atrave´s das queues

@@ -44,7 +44,7 @@ int psk_ikm_get(int index, char *sec, char *ikm)
 	int ret = 0;
 	if(ikm != NULL && sec[0] == 0x04)
 	{
-		if (index >= CTRL_MIN_ADD && index <= CTRL_MAX_ADD)
+		if (index >= CTRL_MIN_ADD && index <= CTRL_MAX_ADD && index != CTRL_DUMMY_ADD)
 		{
 			int unidade = index % 10; //Obtem o indice da PSK
 
